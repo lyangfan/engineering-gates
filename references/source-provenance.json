@@ -1,0 +1,40 @@
+{
+  "schema": "agent-gates.eng-source-provenance/v1",
+  "implementation": {
+    "repository": "lyangfan/engineering-gates",
+    "mode": "independent",
+    "reason": "工程机械校验和执行语义独立维护，不导入 science-gates 的科学状态或报告逻辑。"
+  },
+  "references": [
+    {
+      "repository": "/Users/liuyangfan/Documents/work/science-gates",
+      "commit": "ccaa85c3f6ae387c32b29d32f9b4057d8bf6e06a",
+      "paths": [
+        "scripts/digest_table.py",
+        "scripts/snapshots.py",
+        "scripts/workflow.py"
+      ],
+      "file_sha256": {
+        "scripts/digest_table.py": "f25af57ca40275df091d3dafbe246b85d165a10027136f3dde5b0014567da4a4",
+        "scripts/snapshots.py": "c6622ad092d9045a7977c7579d594ac4566332b7eccae81a5536874557ce7a29",
+        "scripts/workflow.py": "3ddf83e460c2aa541f9f9201758f7e5cb14e14e4a2bc3230dc466fbfc92b91bc"
+      },
+      "adaptation": "只参考可追溯 digest、snapshot 和路径校验的接口边界；重新实现工程角色、schema、attempt 和 gate 语义。",
+      "scientific_semantics_imported": false
+    },
+    {
+      "repository": "/Users/liuyangfan/Documents/work/CT/swine-CT-article",
+      "commit": "27c8efc089ad57acad1884d196755e35ff53ac4e",
+      "paths": [
+        "docs/AGENT_GATE_PROTOCOL_ENG.md",
+        "docs/protocol-engineering-domain-survey-2026-09-22.md"
+      ],
+      "file_sha256": {
+        "docs/AGENT_GATE_PROTOCOL_ENG.md": "e63a96e8531a457edf6e88d29df2d58a36ae0fd84b93fc9e97f8275e17d2ada0",
+        "docs/protocol-engineering-domain-survey-2026-09-22.md": "e51ee3d6dda743c52081e662c1797999234b851d366635c74a0c12e2a7143c9d"
+      },
+      "adaptation": "参考工程审查的 A/B 问题、阻塞严重度和证据确定性缺口；把领域材料重新整理为公开通用协议。",
+      "scientific_semantics_imported": false
+    }
+  ]
+}

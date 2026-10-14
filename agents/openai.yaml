@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Gates"
+  short_description: "Engineering spec and implementation verification gates"
+  default_prompt: "使用 $engineering-gates，把工程需求整理为可验证合同，按门 A/B 审查实现并保留可追溯证据。"

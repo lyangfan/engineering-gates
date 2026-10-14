@@ -1,0 +1,14 @@
+{
+  "schema": "agent-gates.eng-validation-summary/v1",
+  "status": "pending-local-validation",
+  "version": "0.1.0",
+  "commands": [
+    "python3 /Users/liuyangfan/.codex/skills/.system/skill-creator/scripts/quick_validate.py /Users/liuyangfan/Documents/work/engineering-gates",
+    "python3 -B -m unittest discover -s /Users/liuyangfan/Documents/work/engineering-gates/scripts/tests -p 'test_*.py' -v"
+  ],
+  "tests": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0
+  }
+}
