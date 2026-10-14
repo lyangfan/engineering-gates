@@ -1,9 +1,12 @@
-"""EG-S2 regression tests for implementation review B1 findings IB1-01, -02, -03, -05.
+"""EG-S2 regression tests for implementation review findings.
+
+B1: IB1-01, -02, -03, -05.  C1: IC1-01, -02, -03.
 
 Run: /usr/bin/python3 -B -m unittest discover -s tests/acceptance/eg_s2 -t . -v
 """
 
 import os
+import re
 import unittest
 
 try:
@@ -304,38 +307,208 @@ class SpecIdFormTests(S.TraceTestCase):
 
 
 # ---------------------------------------------------------------------------
-# IB1-05: C07 "decision missing from the allocation table" location (C19)
+# IB1-05, IC1-02, IC1-03: C07 allocation failure location (C19)
 # ---------------------------------------------------------------------------
 
 
-class AllocationLocationTests(S.TraceTestCase):
-    """C19: ``line`` is a line of the file named by ``path`` (or null)."""
+def _read_lines(root, rel):
+    with open(os.path.join(str(root), rel), encoding="utf-8-sig") as fh:
+        return fh.read().split("\n")
 
-    # eg:ac EG-S2-AC07
-    # eg:ac EG-S2-AC19
-    # IB1-05
-    def test_ac07_missing_allocation_failure_points_into_its_path(self):
-        fx = S.Fixture()
-        fx.edit(S.SPEC_MAP, "| D-003 | EG-S3 |\n", "")
-        root = self.build(fx)
-        res = self.trace(root, "--mode", "design")
-        self.assertFail(res, "EG-S2-C07")
+
+def _entry_span(registry_lines, did):
+    """1-based first and last line of the registry object whose ``id`` is ``did``."""
+    key = '"id": "%s"' % did
+    hits = [i for i, text in enumerate(registry_lines) if key in text]
+    if len(hits) != 1:
+        raise AssertionError("expected one registry line with %s, found %r" % (key, hits))
+    at = hits[0]
+    start = max(i for i in range(at + 1) if registry_lines[i].strip() == "{")
+    end = min(i for i in range(at, len(registry_lines)) if registry_lines[i].strip().startswith("}"))
+    return start + 1, end + 1
+
+
+def _section_span(map_lines, title):
+    """1-based heading line and last non-blank line of the spec-map section ``title`` (C25)."""
+    heading = re.compile(r"^#{1,6}\s+(?:\d+\.\s*)?" + re.escape(title) + r"\s*$")
+    starts = [i for i, text in enumerate(map_lines) if heading.match(text)]
+    if len(starts) != 1:
+        raise AssertionError("expected one %r heading in the spec map, found %r" % (title, starts))
+    start = starts[0]
+    end = len(map_lines)
+    for i in range(start + 1, len(map_lines)):
+        if re.match(r"^#{1,6}\s", map_lines[i]):
+            end = i
+            break
+    while end > start + 1 and not map_lines[end - 1].strip():
+        end -= 1
+    return start + 1, end
+
+
+def _decision_last(fx, did):
+    """Move ``did`` to the end of the registry, past the last line of the spec map."""
+    entry = fx.decision(did)
+    fx.registry["decisions"].remove(entry)
+    fx.registry["decisions"].append(entry)
+
+
+# (label, fixture change); the base fixture puts D-003's registry line inside the
+# spec map but outside its allocation section, the second variant past its end.
+LOCATION_LAYOUTS = [
+    ("base fixture", None),
+    ("D-003 last in the registry", lambda fx: _decision_last(fx, "D-003")),
+]
+
+
+class AllocationLocationTests(S.TraceTestCase):
+    """C19: a non-null ``line`` is the line of the problem in the file named by ``path``.
+
+    For a C07 allocation failure about decision ``did`` the problem lives either in
+    the registry entry of ``did`` or in the allocation section of the spec map, so a
+    non-null ``line`` must fall inside that span of the file named by ``path``.
+    """
+
+    def _assert_c07_located(self, root, res, did):
+        registry = _read_lines(root, S.DECISIONS)
+        spec_map = _read_lines(root, S.SPEC_MAP)
+        spans = {
+            S.DECISIONS: _entry_span(registry, did),
+            S.SPEC_MAP: _section_span(spec_map, "决定分配"),
+        }
+        # The IB1-05 defect (spec-map path, registry line) is only visible if no line
+        # of the registry entry also lies in the allocation section.
+        entry_lo, entry_hi = spans[S.DECISIONS]
+        alloc_lo, alloc_hi = spans[S.SPEC_MAP]
+        self.assertTrue(
+            entry_hi < alloc_lo or entry_lo > alloc_hi,
+            "fixture precondition: registry lines %r overlap allocation section %r"
+            % (spans[S.DECISIONS], spans[S.SPEC_MAP]),
+        )
         hits = [f for f in res.failures if f.get("check") == "EG-S2-C07"]
         for item in hits:
             path, line = item.get("path"), item.get("line")
             if line is None:
                 continue
-            self.assertIsNotNone(path, "a line number needs a path\n" + res.describe())
-            full = os.path.join(str(root), path)
-            self.assertTrue(os.path.isfile(full), "path is not a file\n" + res.describe())
-            with open(full, encoding="utf-8-sig") as fh:
-                lines = fh.read().split("\n")
-            self.assertLessEqual(line, len(lines), "line beyond end of %s\n%s" % (path, res.describe()))
             self.assertIn(
-                "D-003",
-                lines[line - 1],
-                "line %d of %s does not refer to D-003\n%s" % (line, path, res.describe()),
+                path,
+                spans,
+                "a C07 line must lie in the registry or the spec map\n" + res.describe(),
             )
+            lo, hi = spans[path]
+            self.assertTrue(
+                lo <= line <= hi,
+                "line %d of %s is outside lines %d-%d (%s)\n%s"
+                % (
+                    line,
+                    path,
+                    lo,
+                    hi,
+                    "registry entry of " + did if path == S.DECISIONS else "allocation section",
+                    res.describe(),
+                ),
+            )
+
+    # eg:ac EG-S2-AC07
+    # eg:ac EG-S2-AC19
+    # IB1-05, assertion revised for IC1-03
+    def _check_layouts(self, old_row, new_rows):
+        for label, layout in LOCATION_LAYOUTS:
+            with self.subTest(label):
+                fx = S.Fixture()
+                if layout is not None:
+                    layout(fx)
+                fx.edit(S.SPEC_MAP, old_row, new_rows)
+                root = self.build(fx)
+                res = self.trace(root, "--mode", "design")
+                self.assertFail(res, "EG-S2-C07")
+                self._assert_c07_located(root, res, "D-003")
+
+    # eg:ac EG-S2-AC07
+    # eg:ac EG-S2-AC19
+    # IB1-05, assertion revised for IC1-03
+    def test_ac07_missing_allocation_failure_points_into_its_path(self):
+        self._check_layouts("| D-003 | EG-S3 |\n", "")
+
+    # eg:ac EG-S2-AC07
+    # eg:ac EG-S2-AC19
+    # IC1-02
+    def test_ac07_duplicate_allocation_failure_points_into_its_path(self):
+        self._check_layouts("| D-003 | EG-S3 |\n", "| D-003 | EG-S3 |\n| D-003 | EG-S2 |\n")
+
+
+# ---------------------------------------------------------------------------
+# IC1-01: the coverage declaration ends at the first ``：`` (C14, C15)
+# ---------------------------------------------------------------------------
+
+AC01_LINE = "**[EG-S2-AC01]** 覆盖 EG-S2-C01、EG-S2-C02：描述一。"
+AC02_LINE = "**[EG-S2-AC02]** 覆盖 EG-S2-C03：描述二。"
+
+# (label, original acceptance line, rewritten line); every rewrite keeps the declaration.
+COLON_CASES = [
+    (
+        "CASE 1: per-clause notes after the declaration",
+        AC01_LINE,
+        "**[EG-S2-AC01]** 覆盖 EG-S2-C01、EG-S2-C02：EG-S2-C01：缺键时报错；EG-S2-C02：多键时报错。",
+    ),
+    (
+        "CASE 2: clause ID directly followed by ： later in the text",
+        AC02_LINE,
+        "**[EG-S2-AC02]** 覆盖 EG-S2-C03：描述二，另见EG-S2-C01：说明。",
+    ),
+    (
+        "CASE 2 after a two-ID declaration, other spec's clause ID",
+        AC01_LINE,
+        "**[EG-S2-AC01]** 覆盖 EG-S2-C01、EG-S2-C02：描述一，参见EG-S1-C01：说明。",
+    ),
+]
+
+
+def _colon_fixture(original, rewritten):
+    fx = S.Fixture()
+    fx.edit(S.S2, original, rewritten)
+    return fx
+
+
+class CoverageDeclarationEndTests(S.TraceTestCase):
+    """C14: only IDs in ``覆盖 <条款 ID>[、<条款 ID>…]：`` count, i.e. up to the first ``：``."""
+
+    # eg:ac EG-S2-AC14
+    # eg:ac EG-S2-AC15
+    # IC1-01
+    def test_ac14_clause_ids_after_the_declaration_do_not_break_it(self):
+        for label, original, rewritten in COLON_CASES:
+            with self.subTest(label):
+                root = self.build(_colon_fixture(original, rewritten))
+                for mode in ("spec", "tests"):
+                    res = self.trace(root, "--mode", mode)
+                    self.assertNoCheck(res, "EG-S2-C14", "EG-S2-C15")
+                    self.assertPass(res)
+
+    # eg:ac EG-S2-AC14
+    # eg:ac EG-S2-AC15
+    # IC1-01
+    def test_ac14_declaration_end_holds_for_any_spec_id_form(self):
+        for name, pairs in RENAMINGS:
+            for label, original, rewritten in COLON_CASES:
+                with self.subTest(name + ": " + label):
+                    root = self.build(_renamed(_colon_fixture(original, rewritten), pairs))
+                    for mode in ("spec", "tests"):
+                        res = self.trace(root, "--mode", mode)
+                        self.assertNoCheck(res, "EG-S2-C14", "EG-S2-C15")
+                        self.assertPass(res)
+
+    # eg:ac EG-S2-AC14
+    # eg:ac EG-S2-AC15
+    # IC1-01
+    def test_ac14_clause_named_after_the_first_colon_is_not_covered(self):
+        fx = S.Fixture()
+        fx.add_clause(S.S2, "**[EG-S2-C05]** 第五条（D-002）。")
+        fx.add_ac(S.S2, "**[EG-S2-AC04]** 覆盖 EG-S2-C03：EG-S2-C05：说明。\n- [EG-S2-AC04-W1] 错误实现。")
+        fx.add_marker("EG-S2-AC04")
+        res = self.trace(self.build(fx), "--mode", "spec")
+        # The declaration is "EG-S2-C03", which exists; EG-S2-C05 stays uncovered.
+        self.assertFail(res, "EG-S2-C15")
+        self.assertNoCheck(res, "EG-S2-C14")
 
 
 if __name__ == "__main__":
