@@ -14,7 +14,7 @@
 
 预算 B1 + C1 + C2 已用完。
 
-**状态：FROZEN（2026-10-14）**，冻结字节为 commit `3955513` 中的 `docs/specs/EG-S1-checkpoint.md`（sha256 `55c44f27fe9f83f0c3d474f7cc42f37d5aaf4dfdf16829515e67d4f3bf2e9682`），冻结记录见 `freeze.json`。冻结后的变更按 D-017 处理。
+**状态：FROZEN（2026-10-14）**，冻结字节为 commit `3955513` 中的 `docs/specs/EG-S1-checkpoint.md`（sha256 `55c44f27fe9f83f0c3d474f7cc42f37d5aaf4dfdf16829515e67d4f3bf2e9682`），冻结记录见 `freeze.json`。冻结后的变更按 D-017 处理。局部选择 C01、C04 已经用户过目认可（2026-10-14，D-011）。
 
 ## Findings
 
