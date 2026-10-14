@@ -85,11 +85,11 @@
 
 | ID | 严重度 | 检查项 | 摘要 | 处置 | 状态 |
 |---|---|---|---|---|---|
-| IB1-01 | MAJOR | I1 | AUTHOR-CHOICE 标记后紧跟汉字或字母时不被识别（`isalnum()` 对汉字为真），`--freeze` 下未决实质选择被放行 | 待定 | OPEN |
-| IB1-02 | MAJOR | I2 | 不带 `--spec` 时忽略前缀不属于已有 spec 的测试标记，与 C17、D-010 冲突 | 待定 | OPEN |
-| IB1-03 | MAJOR | I1/I2 | spec ID 写死为 `EG-S<数字>`，与 C25"以档位表第一列为准"冲突 | 待定 | OPEN |
-| IB1-04 | MINOR | I5 | supersedes 链长约 1000 以上递归崩溃 | 待定 | OPEN |
-| IB1-05 | MINOR | I5 | C07"未出现在分配表"的 `line` 取自登记文件而 `path` 为 spec 地图 | 待定 | OPEN |
+| IB1-01 | MAJOR | I1 | AUTHOR-CHOICE 标记后紧跟汉字或字母时不被识别（`isalnum()` 对汉字为真），`--freeze` 下未决实质选择被放行 | 实现错误（用户确认）：修代码 + 回归测试 | FIX_PROPOSED |
+| IB1-02 | MAJOR | I2 | 不带 `--spec` 时忽略前缀不属于已有 spec 的测试标记，与 C17、D-010 冲突 | 实现错误（用户确认；C17 字面适用，C23 只在带 --spec 时收窄）：修代码 + 回归测试 | FIX_PROPOSED |
+| IB1-03 | MAJOR | I1/I2 | spec ID 写死为 `EG-S<数字>`，与 C25"以档位表第一列为准"冲突 | 实现错误（用户确认）：修代码 + 回归测试 | FIX_PROPOSED |
+| IB1-04 | MINOR | I5 | supersedes 链长约 1000 以上递归崩溃 | 接受为已知限制（用户确认；非合理输入） | ACCEPTED_LIMITATION |
+| IB1-05 | MINOR | I5 | C07"未出现在分配表"的 `line` 取自登记文件而 `path` 为 spec 地图 | 实现错误（用户确认）：修代码 + 回归测试 | FIX_PROPOSED |
 
 ## 复盘候选
 
