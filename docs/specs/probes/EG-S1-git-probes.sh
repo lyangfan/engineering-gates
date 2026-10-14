@@ -37,10 +37,16 @@ if g commit -q --no-verify -m r --only -- review.md 2>/dev/null; then r=committe
 check F-14b "$r" "committed" "--no-verify 跳过钩子"
 rm "$(git rev-parse --git-common-dir)/hooks/pre-commit"
 
-# F-15: without user identity, commit fails (simulates CI); -c user.* fixes it
-echo x > c.md
-if env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null HOME="$T" git -c commit.gpgsign=false commit -q -m c -- c.md 2>/dev/null; then r=ok; else r=failed; fi
-check F-15 "$r" "failed" "无 user.name/email 时提交失败"
+# F-15 (v2): with no configured identity, git may still commit using an auto-detected identity.
+# Uses an already-tracked file so the outcome cannot be caused by F-16; the control run with -c user.* must succeed.
+echo x >> b.txt
+if env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git -c commit.gpgsign=false commit -q -m c -- b.txt 2>/dev/null; then r=committed; else r=failed; fi
+echo "F-15 INFO 未配置身份、已跟踪文件：${r}（作者：$(git log -1 --format='%an <%ae>')）"
+cfg_name=$(env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git config user.name || true)
+check F-15 "$cfg_name" "" "未配置身份时 git config user.name 为空，须由命令自行检查，不能依赖 git 报错"
+echo y >> b.txt
+if g commit -q -m c2 -- b.txt 2>/dev/null; then r=committed; else r=failed; fi
+check F-15c "$r" "committed" "对照：配置身份后同一操作成功"
 
 # F-16: committing an untracked path via pathspec requires it to be added first
 echo y > d.md
