@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Unified engineering-gates entry point.
 
-Only the ``trace`` subcommand is implemented here. Later specs register
-further subcommands on ``COMMANDS`` without changing this dispatch shape.
+Subcommands register on ``COMMANDS``. ``trace`` is EG-S2; ``checkpoint``
+and ``identity`` are EG-S1. Adding a subcommand must not change ``trace``.
 """
 
 import sys
@@ -10,10 +10,14 @@ import sys
 sys.dont_write_bytecode = True
 
 from egtrace.engine import run_trace, usage_error
+from egcheckpoint.checkpoint import run_checkpoint
+from egcheckpoint.identity import run_identity
 
 
 COMMANDS = {
     "trace": run_trace,
+    "checkpoint": run_checkpoint,
+    "identity": run_identity,
 }
 
 
