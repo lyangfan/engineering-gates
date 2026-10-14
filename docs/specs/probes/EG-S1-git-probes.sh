@@ -53,4 +53,47 @@ echo y > d.md
 if g commit -q -m d -- d.md 2>/dev/null; then r=ok; else r=failed; fi
 check F-16 "$r" "failed" "未跟踪文件不能直接用 commit -- <path> 提交，须先 add"
 
+# F-17: git reset on a path fails while index.lock exists; control: succeeds after the lock is gone
+cd "$T/repo"
+echo n > n.txt && g add -- n.txt && touch .git/index.lock
+if git reset -q -- n.txt 2>/dev/null; then r=ok; else r=failed; fi
+check F-17 "$r" "failed" "index.lock 存在时 git reset -- <path> 失败"
+rm .git/index.lock
+if git reset -q -- n.txt 2>/dev/null; then r=ok; else r=failed; fi
+check F-17c "$r" "ok" "对照：锁移除后 git reset 成功"
+
+# F-18: GIT_AUTHOR_NAME overrides configured user.name; control: without it the configured name is used
+echo m >> a.txt
+env GIT_AUTHOR_NAME=envname git -c user.name=probe -c user.email=probe@example.invalid -c commit.gpgsign=false commit -q -m m -- a.txt
+check F-18 "$(git log -1 --format=%an)" "envname" "GIT_AUTHOR_NAME 覆盖已配置的 user.name"
+echo m2 >> a.txt
+g commit -q -m m2 -- a.txt
+check F-18c "$(git log -1 --format=%an)" "probe" "对照：不设环境变量时使用配置的身份"
+
+# F-19: terminating a commit blocked in a slow pre-commit hook. SIGTERM to the process group leaves no index.lock;
+# SIGKILL to git alone leaves index.lock behind. Requires python3 for process-group control.
+H="$(git rev-parse --git-common-dir)/hooks"; mkdir -p "$H"
+printf '#!/bin/sh\nsleep 6\n' > "$H/pre-commit"; chmod +x "$H/pre-commit"
+for sig in TERM KILL; do
+  echo "$sig" >> a.txt && g add -- a.txt
+  python3 - "$sig" <<'PY'
+import os, signal, subprocess, sys, time
+sig = sys.argv[1]
+p = subprocess.Popen(['git', '-c', 'user.name=probe', '-c', 'user.email=probe@example.invalid', '-c', 'commit.gpgsign=false',
+                      'commit', '-q', '-m', 'slow', '--only', '--', 'a.txt'], start_new_session=True,
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+time.sleep(1)
+if sig == 'TERM':
+    os.killpg(p.pid, signal.SIGTERM)
+else:
+    p.send_signal(signal.SIGKILL)
+p.wait()
+time.sleep(0.5)
+PY
+  if [ -e .git/index.lock ]; then lock=left; else lock=clean; fi
+  if [ "$sig" = TERM ]; then check F-19 "$lock" "clean" "超时后向进程组发 SIGTERM，不残留 index.lock"; else check F-19c "$lock" "left" "对照：只对 git 发 SIGKILL，残留 index.lock"; fi
+  rm -f .git/index.lock .git/next-index-*.lock; git reset -q -- a.txt 2>/dev/null
+done
+rm -f "$H/pre-commit"
+
 exit $fail

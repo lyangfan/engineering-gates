@@ -114,7 +114,10 @@
       "statement": "LLM 永远不计算、不抄写 hash；所有身份与清单由脚本生成和校验，审查材料只引用脚本输出的身份。git commit 是流程内产物的唯一身份：采用本流程即授权在流程专用工作分支或 worktree 上由脚本做本地检查点提交（spec 冻结、测试冻结、候选实现、审查报告等）；push、merge、发布仍须用户逐次授权。不在 git 中的外部大文件只记录 sha256 与不可变来源。",
       "status": "active",
       "source": "dialogue.md#round-8",
-      "date": "2026-10-14"
+      "date": "2026-10-14",
+      "amended_by": [
+        "D-029"
+      ]
     },
     {
       "id": "D-016",
@@ -204,6 +207,29 @@
       "statement": "EG-S1 起草中的实质选择 X1—X5：X1 checkpoint 与 identity 的退出码为 0 成功或一致、1 前置条件不满足或被拒绝或身份不一致、2 用法或输入错误；X2 调用 git 不经过 shell，单次超时 300 秒，超时按失败处理并恢复暂存区；X3 部分列出路径无改动时照常提交其余路径，无改动的标为 unchanged 并给出其在 HEAD 中的身份，全部无改动才拒绝；X4 列出的路径若已有与 HEAD 不同的暂存内容则拒绝，失败时把这些路径的暂存区恢复到执行前；X5 路径相对于仓库根目录，只接受普通文件，不接受目录、符号链接与 .git 下的路径。",
       "status": "active",
       "source": "dialogue.md#round-s1-x",
+      "date": "2026-10-14",
+      "amended_by": [
+        "D-028"
+      ]
+    },
+    {
+      "id": "D-028",
+      "statement": "EG-S1 故障与边界处理 Y1、Y2、Y3、Y5、Y6：Y1 只对\"锁被占用\"这一种错误做有界重试，最多 5 次、总等待不超过 2 秒，仍失败则失败，绝不删除锁文件；Y2 失败后的暂存区恢复同样按 Y1 有界重试，仍无法恢复时返回 error、退出码 1，在消息中列出仍处于暂存状态的路径并给出恢复命令，不碰其他路径、不删锁，并发验收以不变量断言；Y3 git 在独立进程组中启动，超时后先向进程组发 SIGTERM、等待 10 秒仍未退出再发 SIGKILL，残留的锁不删除并按 Y2 报告，测试可用环境变量 EG_GIT_TIMEOUT_SECONDS 缩短超时，缺省 300 秒；Y5 检测到 GIT_AUTHOR_NAME、GIT_AUTHOR_EMAIL、GIT_COMMITTER_NAME、GIT_COMMITTER_EMAIL 任一环境变量即拒绝，退出码 1，并说明是哪个变量；Y6 退出码 2 只用于命令本身写错（未知参数、缺必需参数、参数取值非法、--at 无法解析、不在 git 仓库中、找不到 git），路径与仓库状态问题为 1 并记为 refused，git 执行失败、超时、锁冲突为 1 并记为 error，检查顺序为参数、路径、分支、身份、暂存内容、有无改动；identity 遇到工作区中已删除的文件时照常输出提交中的身份并记 working_sha256 为 null。",
+      "status": "active",
+      "amends": [
+        "D-027"
+      ],
+      "source": "dialogue.md#round-s1-y",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-029",
+      "statement": "D-015 中\"不在 git 中的外部大文件只记录 sha256 与不可变来源\"这一部分明确后置：当前没有使用者，等第一个真正需要它的项目出现时另立 spec；在此之前流程中的工件都应纳入 git。EG-S1 的非目标与 spec 地图须写明。",
+      "status": "active",
+      "amends": [
+        "D-015"
+      ],
+      "source": "dialogue.md#round-s1-y",
       "date": "2026-10-14"
     }
   ]
