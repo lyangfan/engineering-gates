@@ -274,7 +274,7 @@ C1 审查（新会话，临时仓库实测）裁定 FAIL：B1 关闭 11/12；v0.
 | Q-11 | 状态文件与跨 harness 续跑；AGENTS.md / CLAUDE.md / Cursor / Codex 入口适配 | 已关闭（D-018） |
 | Q-12 | 复盘、经验沉淀，以及流程自身的回归验证（埋雷题库） | 已关闭（D-019） |
 | Q-13 | 与 science-gates 的关系：共享哪些机械实现 | 已关闭（D-020） |
-| Q-14 | GitHub PR 集成：PR 粒度、合并方式与 commit 身份保留（squash/rebase 会使 D-015 引用的提交失效，需 merge commit 或冻结点 tag）、推送授权范围、CI 必过检查、归属 spec（EG-S6 或新 EG-S8） | 部分关闭：合并方式 → D-033（只用 merge commit，EG-S1 无需变更）；PR 粒度、推送授权范围、CI 必过检查、归属 spec 待讨论 |
+| Q-14 | GitHub PR 集成：PR 粒度、合并方式与 commit 身份保留（squash/rebase 会使 D-015 引用的提交失效，需 merge commit 或冻结点 tag）、推送授权范围、CI 必过检查、归属 spec（EG-S6 或新 EG-S8） | 部分关闭：合并方式 → D-033；推送授权 → D-034；PR 粒度、CI 必过检查、归属 spec 待讨论 |
 
 ### EG-S1 冻结与阶段 6 启动 {#s1-frozen}
 
@@ -303,3 +303,7 @@ EG-S1 经 B1 FAIL → C1 FAIL → C2 PASS 冻结于 commit `3955513`（严格档
 用户回答（2026-10-14）：选 A → D-033。
 
 协调者自查：D-015 要求 push 逐次授权；用户此前授权的是一次性同步，此后协调者自行推送了 `cf440ec`、`1e368c2` 两次，超出授权。本次登记后暂停推送，交用户决定推送规则。
+
+### Q-14b：推送授权 {#round-14b}
+
+用户回答（2026-10-14）：一次性授权普通推送 eg/* 分支，不强推、不碰 main、不删远端分支 → D-034（修改 D-015）。同意立即在 GitHub 仓库设置中只允许 merge commit（落实 D-033）。

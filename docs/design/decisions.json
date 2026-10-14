@@ -116,7 +116,8 @@
       "source": "dialogue.md#round-8",
       "date": "2026-10-14",
       "amended_by": [
-        "D-029"
+        "D-029",
+        "D-034"
       ]
     },
     {
@@ -271,6 +272,16 @@
       "statement": "eg/ 流程分支合并进 main 只使用普通 merge commit，禁用 squash 与 rebase，使冻结记录、审查报告等引用的提交号在合并后仍可从 main 到达；合并后删除流程分支不影响引用。需要简洁历史时使用 git log --first-parent。合并仍由用户执行（D-015）。",
       "status": "active",
       "source": "dialogue.md#round-14a",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-034",
+      "statement": "推送授权：用户一次性授权协调者对 eg/ 开头的流程分支做普通推送；不得强制推送、不得推送或修改 main、不得删除远端分支或改写远端历史。合并进 main 与发布仍由用户执行（D-015、D-033）。",
+      "status": "active",
+      "amends": [
+        "D-015"
+      ],
+      "source": "dialogue.md#round-14b",
       "date": "2026-10-14"
     }
   ]
