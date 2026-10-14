@@ -265,6 +265,13 @@
       ],
       "source": "dialogue.md#round-models-2",
       "date": "2026-10-14"
+    },
+    {
+      "id": "D-033",
+      "statement": "eg/ 流程分支合并进 main 只使用普通 merge commit，禁用 squash 与 rebase，使冻结记录、审查报告等引用的提交号在合并后仍可从 main 到达；合并后删除流程分支不影响引用。需要简洁历史时使用 git log --first-parent。合并仍由用户执行（D-015）。",
+      "status": "active",
+      "source": "dialogue.md#round-14a",
+      "date": "2026-10-14"
     }
   ]
 }
