@@ -283,6 +283,13 @@
       ],
       "source": "dialogue.md#round-14b",
       "date": "2026-10-14"
+    },
+    {
+      "id": "D-035",
+      "statement": "子 agent 派发材料：每次派发审查者、测试作者或实现者之前，协调者先把实际发送的提示词全文存为 docs/reviews/<spec>/dispatch-<轮次>.md 并提交，再启动执行，使每份报告与产物都能对应到当时的指令。派发模板（审查者 Baseline、Closure、冻结前轻量复核，测试作者，实现者）归 EG-S5；EG-S5 冻结前以 docs/templates/ 中的草稿为起点。模板不依赖特定 harness 或模型。",
+      "status": "active",
+      "source": "dialogue.md#round-dispatch",
+      "date": "2026-10-14"
     }
   ]
 }
