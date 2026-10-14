@@ -7,8 +7,9 @@ Ambiguities resolved against the spec text (see the final report for the list):
   at least three digits). Clause classification accepts ``D-`` plus one or
   more digits, and a reference that is not an active decision does not
   satisfy EG-S2-C11.
-- With ``--spec``, test markers are examined only when their spec prefix is
-  selected (EG-S2-C23). Markers for any other prefix are ignored.
+- Without ``--spec``, every test marker is checked: an acceptance id that
+  does not exist in any existing spec file is EG-S2-C17. With ``--spec``,
+  only markers whose id prefix is a selected spec are checked (EG-S2-C23).
 - ``local_choices[].line`` is the line of the ``[AUTHOR-CHOICE:local]`` marker.
 - A checklist spec id that is absent from the tier table is EG-S2-C25.
 - A line-start clause or acceptance marker with fewer than two digits is not
@@ -39,24 +40,26 @@ ALLOC_HEADERS = ("决定", "去向")
 
 ID_RE = re.compile(r"^D-\d{3,}$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-SPEC_ID_RE = re.compile(r"^EG-S\d+$")
 OPEN_FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,})([^`]*)\s*$")
 CLOSE_FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,})\s*$")
 HEADING_RE = re.compile(r"^[ ]{0,3}(#{1,6})[ \t]+(.+?)\s*$")
-CLAUSE_RE = re.compile(r"^\*\*\[(EG-S\d+)-C(\d{2,})\]\*\*(.*)$")
-ACCEPTANCE_RE = re.compile(r"^\*\*\[(EG-S\d+)-AC(\d{2,})\]\*\*(.*)$")
+# Spec ids come from the tier table. Markers use a generic prefix; ``]`` and
+# whitespace are excluded only so the marker and table grammars stay parseable.
+CLAUSE_RE = re.compile(r"^\*\*\[([^\]\s]+?)-C(\d{2,})\]\*\*(.*)$")
+ACCEPTANCE_RE = re.compile(r"^\*\*\[([^\]\s]+?)-AC(\d{2,})\]\*\*(.*)$")
 COVERAGE_RE = re.compile(
-    r"^\s*覆盖\s*((?:EG-S\d+-C\d{2,})(?:\s*、\s*EG-S\d+-C\d{2,})*)\s*："
+    r"^\s*覆盖\s*((?:[^\s、]+-C\d{2,})(?:\s*、\s*[^\s、]+-C\d{2,})*)\s*："
 )
-CLAUSE_ID_RE = re.compile(r"(?<![A-Za-z0-9])(EG-S\d+-C\d{2,})(?![A-Za-z0-9])")
 DESIGN_ID_RE = re.compile(r"(?<![A-Za-z0-9])(D-\d{3,})(?![A-Za-z0-9])")
 DEC_REF_RE = re.compile(r"(?<![A-Za-z0-9])(D-\d+)(?![A-Za-z0-9])")
 FACT_REF_RE = re.compile(r"(?<![A-Za-z0-9])(F-\d+)(?![A-Za-z0-9])")
 WI_LINE_RE = re.compile(r"^[ \t]*-[ \t]+\[([^\]]+)\]")
-WI_ID_RE = re.compile(r"^(EG-S\d+-AC\d{2,})-W(\d+)$")
+WI_ID_RE = re.compile(r"^(.+-AC\d{2,})-W(\d+)$")
 MARKER_RE = re.compile(
-    r"(?<![A-Za-z0-9_])eg:ac[ \t]+(EG-S\d+-AC\d{2,})(?![A-Za-z0-9])"
+    r"(?<![A-Za-z0-9_])eg:ac[ \t]+([^\s]+?-AC\d{2,})(?![A-Za-z0-9])"
 )
+CLAUSE_SUFFIX_RE = re.compile(r"^(.+)-C\d{2,}$")
+ACCEPTANCE_SUFFIX_RE = re.compile(r"^(.+)-AC\d{2,}$")
 LOCAL_MARK = "[AUTHOR-CHOICE:local]"
 SUBST_MARK = "[AUTHOR-CHOICE:substantive]"
 YES_PREFIX = "是："
@@ -817,8 +820,59 @@ def extract_table(body):
     return None
 
 
-def parse_destination(cell):
-    """Return ``(kind, ids, error)``. ``kind`` is specs, not_in_spec, or global."""
+def _spec_id_usable(spec_id):
+    """True when a tier-table cell can be used as a spec id.
+
+    The id is the cell text. Whitespace and ``]`` are rejected because clause
+    markers and Markdown cells cannot carry them; this is not a spelling rule.
+    """
+    if spec_id == "":
+        return False
+    if "]" in spec_id:
+        return False
+    for ch in spec_id:
+        if ch.isspace():
+            return False
+    return True
+
+
+def _marked_spec(full_id, suffix_re):
+    """Return the spec id of ``<spec>-Cdd`` or ``<spec>-ACdd``."""
+    match = suffix_re.match(full_id)
+    if match:
+        return match.group(1)
+    return None
+
+
+def _dest_boundary(text, index):
+    if index >= len(text):
+        return True
+    ch = text[index]
+    return ch.isspace() or ch in "、（("
+
+
+def _match_known_spec(rest, ordered):
+    for sid in ordered:
+        if rest.startswith(sid) and _dest_boundary(rest, len(sid)):
+            return sid
+    return None
+
+
+def _raw_spec_token(rest):
+    index = 0
+    while index < len(rest) and not _dest_boundary(rest, index):
+        index += 1
+    if index == 0:
+        return None
+    return rest[:index]
+
+
+def parse_destination(cell, spec_ids):
+    """Return ``(kind, ids, error)``. ``kind`` is specs, not_in_spec, or global.
+
+    Spec ids are matched from the tier table (longest first). A token that is
+    not in that set is still returned so the caller can report it as unknown.
+    """
     text = cell.strip()
     if text.startswith(NOT_IN_SPEC):
         reason = text[len(NOT_IN_SPEC) :].strip()
@@ -831,13 +885,22 @@ def parse_destination(cell):
     rest = text
     if rest == "":
         return "specs", [], "去向为空"
+    ordered = sorted(spec_ids, key=len, reverse=True)
     while rest:
         rest = rest.lstrip()
-        match = re.match(r"(EG-S\d+)", rest)
-        if not match:
-            return "specs", [], "去向无法识别：%s" % text
-        ids.append(match.group(1))
-        rest = rest[match.end() :].lstrip()
+        if rest == "":
+            break
+        matched = _match_known_spec(rest, ordered)
+        if matched is None:
+            raw = _raw_spec_token(rest)
+            if raw is None:
+                return "specs", [], "去向无法识别：%s" % text
+            ids.append(raw)
+            rest = rest[len(raw) :]
+        else:
+            ids.append(matched)
+            rest = rest[len(matched) :]
+        rest = rest.lstrip()
         if rest.startswith("（"):
             end = rest.find("）")
             if end < 0:
@@ -915,11 +978,11 @@ def parse_map(text):
                         problem("EG-S2-C25", "档位表 spec ID 重复：%s" % spec_id, path=None, line=line)
                     )
                 seen.add(spec_id)
-                if not SPEC_ID_RE.match(spec_id):
+                if not _spec_id_usable(spec_id):
                     model["structural"].append(
                         problem(
                             "EG-S2-C25",
-                            "档位表 spec ID 必须为全称（如 EG-S2）：%s" % spec_id,
+                            "档位表 spec ID 不能为空或包含空白或 ]：%s" % spec_id,
                             path=None,
                             line=line,
                         )
@@ -952,7 +1015,7 @@ def _cell(cells, index):
     return ""
 
 
-def evaluate_map(model, by_id, clause_ids, map_path, failures):
+def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
     for item in model["structural"]:
         item = dict(item)
         item["path"] = map_path
@@ -994,7 +1057,7 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
                 )
                 continue
             counts[did] = counts.get(did, 0) + 1
-            _kind, ids, error = parse_destination(dest)
+            _kind, ids, error = parse_destination(dest, model["spec_ids"])
             if error:
                 failures.append(
                     problem("EG-S2-C07", "决定 %s 的去向：%s" % (did, error), path=map_path, line=line)
@@ -1028,9 +1091,17 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
         if count != 1:
             if count == 0:
                 message = "active 决定 %s 没有出现在决定分配表中" % decision.id
+                failures.append(
+                    problem(
+                        "EG-S2-C07",
+                        message,
+                        path=decisions_path,
+                        line=decision.line,
+                    )
+                )
             else:
                 message = "active 决定 %s 在决定分配表中出现了 %d 次" % (decision.id, count)
-            failures.append(problem("EG-S2-C07", message, path=map_path, line=decision.line))
+                failures.append(problem("EG-S2-C07", message, path=map_path, line=decision.line))
     if headers_ok and model["tier_rows"]:
         columns = {}
         for offset, sid in enumerate(header_ids):
@@ -1065,6 +1136,11 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
             column = columns.get(sid)
             yes = False
             all_no = column is not None and bool(model["check_rows"])
+            clause_note_re = None
+            if sid in clause_ids:
+                clause_note_re = re.compile(
+                    r"(?<![A-Za-z0-9])" + re.escape(sid) + r"-C\d{2,}(?![A-Za-z0-9])"
+                )
             if column is None:
                 all_no = False
             else:
@@ -1086,11 +1162,9 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
                             )
                         else:
                             yes = True
-                            if sid in clause_ids:
+                            if clause_note_re is not None:
                                 found = [
-                                    match.group(1)
-                                    for match in CLAUSE_ID_RE.finditer(note)
-                                    if match.group(1).startswith(sid + "-C")
+                                    match.group(0) for match in clause_note_re.finditer(note)
                                 ]
                                 if not any(item in clause_ids[sid] for item in found):
                                     failures.append(
@@ -1208,16 +1282,8 @@ def build_docs(spec_files, texts, spec_ids):
 def _block_text_has(block, token):
     lines = []
     for line_no, text in block.lines:
-        start = 0
-        while True:
-            found = text.find(token, start)
-            if found < 0:
-                break
-            end = found + len(token)
-            if end == len(text) or not text[end].isalnum():
-                lines.append(line_no)
-                break
-            start = found + 1
+        if token in text:
+            lines.append(line_no)
     return lines
 
 
@@ -1421,7 +1487,7 @@ def _coverage(block, owner, clause_ids, path, failures):
     declared = [part.strip() for part in match.group(1).split("、")]
     ok = set()
     for clause_id in declared:
-        prefix = clause_id.split("-C", 1)[0]
+        prefix = _marked_spec(clause_id, CLAUSE_SUFFIX_RE)
         if prefix != owner or clause_id not in clause_ids:
             failures.append(
                 problem(
@@ -1482,15 +1548,7 @@ def _wrong_implementations(block, path, failures):
 
 
 def _line_has_token(text, token):
-    start = 0
-    while True:
-        found = text.find(token, start)
-        if found < 0:
-            return False
-        end = found + len(token)
-        if end == len(text) or not text[end].isalnum():
-            return True
-        start = found + 1
+    return token in text
 
 
 def _freeze_markers(parsed, sid, failures, local_choices):
@@ -1521,7 +1579,7 @@ def _freeze_markers(parsed, sid, failures, local_choices):
         )
 
 
-def check_test_markers(test_texts, docs, selected, failures):
+def check_test_markers(test_texts, docs, selected, failures, restrict_prefix):
     all_acceptances = {}
     for sid, files in docs.items():
         for parsed in files:
@@ -1532,9 +1590,9 @@ def check_test_markers(test_texts, docs, selected, failures):
     for rel, text in test_texts:
         for match in MARKER_RE.finditer(text):
             ac_id = match.group(1)
-            prefix = ac_id.split("-AC", 1)[0]
+            prefix = _marked_spec(ac_id, ACCEPTANCE_SUFFIX_RE)
             line = text.count("\n", 0, match.start()) + 1
-            if prefix not in selected_set:
+            if restrict_prefix and prefix not in selected_set:
                 continue
             found.add(ac_id)
             if ac_id not in all_acceptances:
@@ -1640,6 +1698,7 @@ def run_trace(argv):
         project["by_id"],
         clause_ids,
         project["map_path"],
+        project["decisions_path"],
         failures,
     )
     local_choices = []
@@ -1656,7 +1715,9 @@ def run_trace(argv):
             local_choices,
         )
     if mode == "tests":
-        check_test_markers(project["test_texts"], docs, selected, failures)
+        check_test_markers(
+            project["test_texts"], docs, selected, failures, bool(args["specs"])
+        )
     report_specs = selected
     if failures:
         return emit(mode, report_specs, args["freeze"], failures, local_choices, 1)
