@@ -41,7 +41,8 @@ rm "$(git rev-parse --git-common-dir)/hooks/pre-commit"
 # Uses an already-tracked file so the outcome cannot be caused by F-16; the control run with -c user.* must succeed.
 echo x >> b.txt
 if env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git -c commit.gpgsign=false commit -q -m c -- b.txt 2>/dev/null; then r=committed; else r=failed; fi
-echo "F-15 INFO 未配置身份、已跟踪文件：${r}（作者：$(git log -1 --format='%an <%ae>')）"
+echo "F-15 INFO 作者：$(git log -1 --format='%an <%ae>')"
+check F-15a "$r" "committed" "本机 git 在未配置身份时以自动推断的身份提交已跟踪文件"
 cfg_name=$(env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null git config user.name || true)
 check F-15 "$cfg_name" "" "未配置身份时 git config user.name 为空，须由命令自行检查，不能依赖 git 报错"
 echo y >> b.txt
@@ -95,5 +96,21 @@ PY
   rm -f .git/index.lock .git/next-index-*.lock; git reset -q -- a.txt 2>/dev/null
 done
 rm -f "$H/pre-commit"
+
+# F-20: author.name in config overrides user.name; control: without it user.name is used
+cd "$T/repo"
+echo z >> a.txt
+g -c author.name=cfgauthor commit -q -m z -- a.txt
+check F-20 "$(git log -1 --format=%an)" "cfgauthor" "author.name 配置覆盖 user.name"
+echo z2 >> a.txt
+g commit -q -m z2 -- a.txt
+check F-20c "$(git log -1 --format=%an)" "probe" "对照：不设 author.name 时使用 user.name"
+
+# F-21: a custom trailer is readable via git log trailers; control: absent trailer reads as empty
+echo t >> a.txt
+printf 'eg(record): - t\n\nEG-Kind: record\nEG-Spec: -\nEG-Run: 0123456789abcdef0123456789abcdef\n' > "$T/msg"
+g commit -q -F "$T/msg" -- a.txt
+check F-21 "$(git log -1 --format='%(trailers:key=EG-Run,valueonly)' | tr -d '\n')" "0123456789abcdef0123456789abcdef" "EG-Run trailer 可由 git log 读出"
+check F-21c "$(git log -1 --skip=1 --format='%(trailers:key=EG-Run,valueonly)' | tr -d '\n')" "" "对照：不带该 trailer 的提交读出为空"
 
 exit $fail

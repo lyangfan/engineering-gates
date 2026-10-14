@@ -1,8 +1,8 @@
 # EG-S1 身份与检查点
 
-> 状态：草稿 v0.3（阶段 4），按 B1 审查修订；B1 后的决定已登记为 D-028、D-029，待 C1 审查，未冻结。
+> 状态：草稿 v0.4（阶段 4），按 C1 审查修订；C1 后的决定已登记为 D-030，待 C2 审查（最后一轮），未冻结。
 > 档位：严格。依赖：无。
-> 分配决定：D-015、D-018（身份字段）、D-026、D-027、D-028；全局约束 D-020、D-021。
+> 分配决定：D-015、D-018（身份字段）、D-026、D-027、D-028、D-030；全局约束 D-020、D-021。
 > 写法遵循 D-022、D-024；本文中描述语法的示例写在反引号或代码块内。
 
 ## 1. 目标与非目标
@@ -31,7 +31,7 @@
 
 **[EG-S1-C04]** 当前分支名必须以 `eg/` 开头；分离 HEAD 或其他分支一律 `refused`，退出码 1，不做任何 git 写操作（D-026 K1）。分支尚无任何提交时同样 `refused`，消息说明须先有一个初始提交；这种情况只在 `git init` 后直接使用 eg 分支时出现。[AUTHOR-CHOICE:local]
 
-**[EG-S1-C05]** 提交者身份取自 `git config user.name` 与 `git config user.email`，命令自行检查二者均非空，不依赖 git 报错（git 在未配置时会自动推断身份并提交，F-15）。任一为空，或环境中设置了 `GIT_AUTHOR_NAME`、`GIT_AUTHOR_EMAIL`、`GIT_COMMITTER_NAME`、`GIT_COMMITTER_EMAIL` 中的任一变量（它们会覆盖配置，F-18），即 `refused`、退出码 1，消息指出缺少的配置项或存在的变量名；不以 `-c` 或环境变量补造身份（D-026 K4、D-028 Y5）。
+**[EG-S1-C05]** 提交者身份取自 `git config user.name` 与 `git config user.email`，命令自行检查二者均非空，不依赖 git 报错（git 在未配置时会自动推断身份并提交，F-15）。任一为空，或环境中设置了 `GIT_AUTHOR_NAME`、`GIT_AUTHOR_EMAIL`、`GIT_COMMITTER_NAME`、`GIT_COMMITTER_EMAIL` 中的任一变量（它们会覆盖配置，F-18），即 `refused`、退出码 1，消息指出缺少的配置项或存在的变量名。`git config` 中配置了 `author.name`、`author.email`、`committer.name`、`committer.email` 任一项（它们同样会覆盖 `user.*`，F-20）时同样 `refused`，消息指出该配置项。不以 `-c` 或环境变量补造身份（D-026 K4、D-028 Y5、D-030 Z2）。
 
 **[EG-S1-C06]** 每个列出的路径，其暂存区内容必须与 HEAD 中的内容相同（或该路径在 HEAD 与暂存区中都不存在）；否则 `refused`、退出码 1。这样命令执行 `add` 时不会覆盖用户另行暂存的版本，失败时也能确定暂存区应恢复成什么（D-027 X4）。
 
@@ -43,18 +43,19 @@
 
 **[EG-S1-C09]** 命令结束时（无论成功、被拒绝还是出错），未列出的路径在工作区与暂存区中的状态必须与命令执行前完全相同（D-026 K2，F-12b）。
 
-**[EG-S1-C10]** `--kind` 必须为 `spec-freeze`、`tests-freeze`、`candidate`、`review`、`record` 之一；`--spec` 可选，给出时必须非空且只含字母、数字、`.`、`_`、`-`（缺省记为 `-`）；`--message` 可选，给出时必须是不含换行或回车的非空单行文字（缺省为 `checkpoint`）。不满足即参数错误，退出码 2（D-026 K5、D-028 Y6）。提交信息格式如下，最后两行为固定的 trailer：
+**[EG-S1-C10]** `--kind` 必须为 `spec-freeze`、`tests-freeze`、`candidate`、`review`、`record` 之一；`--spec` 可选，给出时必须非空且只含字母、数字、`.`、`_`、`-`（缺省记为 `-`）；`--message` 可选，给出时必须是不含换行或回车的非空单行文字（缺省为 `checkpoint`）。不满足即参数错误，退出码 2（D-026 K5、D-028 Y6）。提交信息格式如下，最后三行为固定的 trailer；`<运行标识>` 由命令在每次运行时随机生成，为 32 位小写十六进制（D-030 Z1，F-21）：
 
 ```text
 eg(<kind>): <spec ID 或 -> <摘要>
 
 EG-Kind: <kind>
 EG-Spec: <spec ID 或 ->
+EG-Run: <运行标识>
 ```
 
-**[EG-S1-C11]** 钩子拒绝提交、git 返回非零、超时（C14）或锁冲突重试用尽（C15）时：不产生提交；对已执行过 `add` 的路径执行 `git reset -q -- <路径>`，使其暂存区恢复到执行前的状态；恢复遇到锁冲突时按 C15 有界重试。恢复成功时，输出 `result: error`（钩子拒绝时为 `refused`），退出码 1。恢复仍失败时输出 `result: error`、退出码 1，`message` 列出仍处于已暂存状态的路径，并给出恢复命令 `git reset -q -- <路径>`；不触碰其他路径，不删除任何锁文件。命令被强行终止而来不及恢复时，下一次对相同路径执行 checkpoint 会因 C06 被拒绝，消息中同样给出恢复命令（D-026 K3、D-028 Y2，F-14、F-17）。
+**[EG-S1-C11]** 钩子拒绝提交、git 返回非零、超时（C14）或锁冲突重试用尽（C15）时：不产生提交；若 C08 的 `add` 已执行，对本次全部有改动的路径执行一次 `git reset -q -- <路径>…`，使其暂存区恢复到执行前的状态；恢复遇到锁冲突时按 C15 有界重试，恢复的重试使用独立的一份等待预算。恢复成功时，输出 `result: error`（钩子拒绝时为 `refused`），退出码 1。恢复仍失败时输出 `result: error`、退出码 1，`message` 列出仍处于已暂存状态的路径，并给出恢复命令 `git reset -q -- <路径>`；不触碰其他路径，不删除任何锁文件。命令被强行终止而来不及恢复时，下一次对相同路径执行 checkpoint 会因 C06 被拒绝，消息中同样给出恢复命令（D-026 K3、D-028 Y2，F-14、F-17）。
 
-**[EG-S1-C12]** 提交成功的判定与提交号的取得：提交后读取新的 HEAD，它的唯一父提交必须是 C08 记录的 HEAD，且它相对父提交改动的路径集合必须恰好等于本次有改动的路径；否则视为执行出错（`result: error`、退出码 1），已产生的提交不改写，`message` 给出该提交号。`sha256` 为提交中该文件字节的 SHA-256，`blob` 为 git 对象 ID，均从提交中读回计算，不取自工作区；状态文件等处的身份字段只取自本命令与 C13 的输出（D-015、D-018、D-026 K5、D-028 Y2，F-13）。成功时的输出：
+**[EG-S1-C12]** 提交成功的判定与提交号的取得：`git commit` 返回 0 后，在 C08 记录的 HEAD（不含）到当前 HEAD（含）之间，找出 `EG-Run` trailer 等于本次运行标识的提交；必须恰好找到一个，且它只有一个父提交，相对该父提交改动的路径集合恰好等于本次有改动的路径。满足时该提交即为本次提交号，不要求它是当前 HEAD，也不要求它的父提交等于 C08 记录的 HEAD（其间可能有其他进程的提交）。不满足时视为执行出错（`result: error`、退出码 1），已产生的提交不改写，`message` 给出找到的提交号（如有）（D-030 Z1）。`sha256` 为提交中该文件字节的 SHA-256，`blob` 为 git 对象 ID，均从提交中读回计算，不取自工作区；状态文件等处的身份字段只取自本命令与 C13 的输出（D-015、D-018、D-026 K5、D-028 Y2，F-13）。成功时的输出：
 
 ```json
 {
@@ -74,7 +75,7 @@ EG-Spec: <spec ID 或 ->
 
 ### 2.4 identity
 
-**[EG-S1-C13]** `identity --path <路径> [--at <版本>]`：`--at` 缺省为 `HEAD`，可为任何 git 能解析为 commit 的写法，无法解析为参数错误（退出码 2）。路径的形式规则同 C03，但工作区中不要求存在；存在时必须是普通文件。命令输出该路径在该 commit 中的 `blob` 与 `sha256`、工作区文件的 `working_sha256`（文件不存在时为 `null`），以及二者是否一致（`matches`）。`matches` 为 true 时退出码 0；路径在该 commit 中不存在、或工作区文件缺失、或二者不一致时退出码 1（D-026 K6、D-028 Y6，F-13）。
+**[EG-S1-C13]** `identity --path <路径> [--at <版本>]`：`--at` 缺省为 `HEAD`，可为任何 git 能解析为 commit 的写法，无法解析为参数错误（退出码 2）。路径的形式规则同 C03，但工作区中不要求存在；存在时必须是普通文件。命令输出该路径在该 commit 中的 `blob` 与 `sha256`、工作区文件的 `working_sha256`（文件不存在时为 `null`），以及二者是否一致（`matches`）。`matches` 为 true 时退出码 0；路径在该 commit 中不存在、或工作区文件缺失、或二者不一致时退出码 1。路径不满足形式规则、或工作区中存在但不是普通文件时，`result` 为 `error`、退出码 1，`commit`、`blob`、`sha256`、`working_sha256` 为 `null`，`matches` 为 false，`message` 指出违反的规则（D-026 K6、D-028 Y6，F-13）。
 
 ```json
 {
@@ -90,7 +91,7 @@ EG-Spec: <spec ID 或 ->
 }
 ```
 
-`result` 取值：`match`（一致）、`mismatch`（二者都存在但不一致，或工作区文件缺失）、`missing`（该 commit 中不存在该路径）、`error`（命令写错或 git 执行出错）。
+`result` 取值：`match`（一致）、`mismatch`（二者都存在但不一致，或工作区文件缺失）、`missing`（该 commit 中不存在该路径）、`error`（命令写错、路径不满足规则或 git 执行出错）。
 
 ### 2.5 非成功输出
 
@@ -98,11 +99,11 @@ EG-Spec: <spec ID 或 ->
 
 ### 2.6 执行与故障
 
-**[EG-S1-C14]** 通过 `PATH` 查找 `git` 可执行文件，每次调用都以参数列表方式执行（不经过 shell），并在独立的进程组中启动。单次调用超时为 300 秒；环境变量 `EG_GIT_TIMEOUT_SECONDS` 为正整数时以它为准，取值非法为参数错误（退出码 2）。超时后先向整个进程组发 SIGTERM，等待 10 秒仍未退出再发 SIGKILL；之后按 C11 处理，残留的锁文件不删除（D-027 X2、D-028 Y3，F-19）。
+**[EG-S1-C14]** 通过 `PATH` 查找 `git` 可执行文件，每次调用都以参数列表方式执行（不经过 shell），并在独立的进程组中启动。单次调用超时为 300 秒；环境变量 `EG_GIT_TIMEOUT_SECONDS` 为 1 到 300 之间的整数时以它为准，只能用于缩短超时；其他取值为参数错误（退出码 2）。超时后先向整个进程组发 SIGTERM，等待 10 秒仍未退出再发 SIGKILL；之后按 C11 处理，残留的锁文件不删除（D-027 X2、D-028 Y3，F-19）。
 
-**[EG-S1-C15]** git 因另一进程持有仓库锁而失败时（标准错误中出现 `index.lock` 且含 `File exists`），对该次 git 调用做有界重试：最多 5 次，各次之间的等待合计不超过 2 秒；其他错误不重试。重试用尽即按 C11 以 `result: error` 结束。任何情况下都不删除锁文件（D-028 Y1，F-17）。
+**[EG-S1-C15]** git 因另一进程持有仓库锁而失败时（标准错误中出现 `index.lock` 且含 `File exists`），对该次 git 调用做有界重试：最多 5 次，各次之间的等待合计不超过 2 秒；C11 中的恢复另有一份同样的预算；其他错误不重试。重试用尽即按 C11 以 `result: error` 结束。任何情况下都不删除锁文件（D-028 Y1，F-17）。
 
-**[EG-S1-C16]** 实现只依赖 Python 3.9 及以上的标准库与 git 命令行（D-020、D-021）。按 D-012，在实现开始前与审实现前各重跑一次 `docs/specs/probes/EG-S1-git-probes.sh`；运行环境的 git 版本不是 2.50.1 时，在运行记录中单列（D-012，F-11—F-19）。
+**[EG-S1-C16]** 实现只依赖 Python 3.9 及以上的标准库与 git 命令行（D-020、D-021）。按 D-012，在实现开始前与审实现前各重跑一次 `docs/specs/probes/EG-S1-git-probes.sh`；运行环境的 git 版本不是 2.50.1 时，在运行记录中单列（D-012，F-11—F-21）。
 
 ## 3. 验收
 
@@ -123,10 +124,11 @@ EG-Spec: <spec ID 或 ->
 - [EG-S1-AC04-W1] 只拒绝 `main`，放行其他非 eg 分支。
 - [EG-S1-AC04-W2] 分离 HEAD 时照常提交。
 
-**[EG-S1-AC05]** 覆盖 EG-S1-C05：在 `GIT_CONFIG_GLOBAL=/dev/null`、`GIT_CONFIG_SYSTEM=/dev/null` 且仓库未配置身份的环境中，对已跟踪文件运行，`refused` 且不产生提交，消息指出缺少的配置项；身份已配置但设置了 `GIT_AUTHOR_NAME` 时 `refused`，消息指出该变量名。
+**[EG-S1-AC05]** 覆盖 EG-S1-C05：在 `GIT_CONFIG_GLOBAL=/dev/null`、`GIT_CONFIG_SYSTEM=/dev/null` 且仓库未配置身份的环境中，对已跟踪文件运行，`refused` 且不产生提交，消息指出缺少的配置项；身份已配置但设置了 `GIT_AUTHOR_NAME` 时 `refused`，消息指出该变量名；仓库配置了 `author.name` 时 `refused`，消息指出该配置项。
 - [EG-S1-AC05-W1] 缺身份时用固定的占位身份提交。
 - [EG-S1-AC05-W2] 不检查配置，依赖 git 报错；git 以自动推断的身份提交成功（F-15）。
 - [EG-S1-AC05-W3] 不检查身份环境变量，以环境变量中的身份提交（F-18）。
+- [EG-S1-AC05-W4] 只检查 `user.*`，以 `author.name` 配置的身份提交（F-20）。
 
 **[EG-S1-AC06]** 覆盖 EG-S1-C06：列出的路径已有与 HEAD 不同的暂存内容时 `refused`，用户暂存的那个版本保持不变。
 - [EG-S1-AC06-W1] 直接 `add` 覆盖用户暂存的版本后提交工作区版本。
@@ -144,8 +146,9 @@ EG-Spec: <spec ID 或 ->
 - [EG-S1-AC09-W1] 用不带 `--only` 的 `git commit`，把已暂存的无关改动一起提交。
 - [EG-S1-AC09-W2] 失败后执行不带路径的 `git reset`，清空整个暂存区，丢失用户暂存的无关改动。
 
-**[EG-S1-AC10]** 覆盖 EG-S1-C10：提交信息首行为 `eg(spec-freeze): EG-S1 freeze v0.3`，trailer 可被 `git log --format='%(trailers:key=EG-Kind,valueonly)'` 读出为 `spec-freeze`；`--message` 含换行时退出码 2 且不产生提交；`--spec` 含空格时退出码 2。
+**[EG-S1-AC10]** 覆盖 EG-S1-C10：提交信息首行为 `eg(spec-freeze): EG-S1 freeze v0.4`，trailer 可被 `git log --format='%(trailers:key=EG-Kind,valueonly)'` 读出为 `spec-freeze`；`EG-Run` 为 32 位小写十六进制，两次运行的值不同；`--message` 含换行时退出码 2 且不产生提交；`--spec` 含空格时退出码 2。
 - [EG-S1-AC10-W1] 省略 trailer，只写首行。
+- [EG-S1-AC10-W4] 使用固定的或可预测的运行标识（如时间戳），两次运行相同。
 - [EG-S1-AC10-W2] 接受任意 `--kind` 值。
 - [EG-S1-AC10-W3] 接受含换行的 `--message`，使其中伪造的 `EG-Kind:` 行成为 trailer。
 
@@ -154,11 +157,12 @@ EG-Spec: <spec ID 或 ->
 - [EG-S1-AC11-W2] 钩子失败后不恢复暂存区，列出的路径停留在已暂存状态且消息中没有说明。
 - [EG-S1-AC11-W3] 恢复遇到锁时删除锁文件再恢复。
 
-**[EG-S1-AC12]** 覆盖 EG-S1-C12：输出中每个 `committed` 路径的 `sha256` 等于 `git show <commit>:<路径>` 字节的 SHA-256；在提交后、读回前修改工作区文件（故障注入），输出仍是提交中字节的身份；用一个在提交时额外提交另一文件的 post-commit 钩子（故障注入）运行，校验不通过，输出 `result: error` 并给出该提交号。
+**[EG-S1-AC12]** 覆盖 EG-S1-C12：输出中每个 `committed` 路径的 `sha256` 等于 `git show <commit>:<路径>` 字节的 SHA-256；在提交后、读回前修改工作区文件（故障注入），输出仍是提交中字节的身份；用一个在本次提交之后立即再提交另一文件的 post-commit 钩子（模拟并发，故障注入；钩子须以环境变量等方式防止自身提交再次触发自己，否则会无限递归）运行，输出 `result: committed`，`commit` 为本次提交而不是当前 HEAD；本次提交的改动路径与列出的路径不一致时（用一个修改暂存区的 pre-commit 钩子注入），输出 `result: error` 并给出找到的提交号。
 - [EG-S1-AC12-W1] 从工作区文件计算 `sha256`。
-- [EG-S1-AC12-W2] 直接读取提交后的 HEAD 作为本次提交号，不核对父提交与改动路径。
+- [EG-S1-AC12-W2] 直接读取提交后的 HEAD 作为本次提交号，在 post-commit 钩子场景下报告了另一个提交。
+- [EG-S1-AC12-W3] 要求父提交等于执行前的 HEAD，在 post-commit 钩子之外有并发提交时把正确的提交判为失败。
 
-**[EG-S1-AC13]** 覆盖 EG-S1-C13：对未修改的已提交文件 `result: match`、退出码 0；修改工作区后 `mismatch`、退出码 1；工作区中已删除的文件对旧 commit 查询，输出提交中的 `blob` 与 `sha256`、`working_sha256: null`、退出码 1；该 commit 中不存在的路径为 `missing`、`blob` 与 `sha256` 为 `null`、退出码 1；`--at` 无法解析时退出码 2 且 `commit` 为 `null`。
+**[EG-S1-AC13]** 覆盖 EG-S1-C13：对未修改的已提交文件 `result: match`、退出码 0；修改工作区后 `mismatch`、退出码 1；工作区中已删除的文件对旧 commit 查询，输出提交中的 `blob` 与 `sha256`、`working_sha256: null`、退出码 1；该 commit 中不存在的路径为 `missing`、`blob` 与 `sha256` 为 `null`、退出码 1；`--at` 无法解析时退出码 2 且 `commit` 为 `null`；路径为目录或含 `..` 时 `result: error`、退出码 1。
 - [EG-S1-AC13-W1] 只比较文件大小或修改时间。
 - [EG-S1-AC13-W2] 忽略 `--at`，总是读 HEAD。
 - [EG-S1-AC13-W3] 工作区文件已删除时按路径规则拒绝，不输出提交中的身份。
@@ -167,12 +171,12 @@ EG-Spec: <spec ID 或 ->
 - [EG-S1-AC17-W1] 失败时标准输出为空或只有文字。
 - [EG-S1-AC17-W2] 失败时 `paths` 中仍填入工作区文件的 `sha256`。
 
-**[EG-S1-AC14]** 覆盖 EG-S1-C14：设置 `EG_GIT_TIMEOUT_SECONDS=1`，用一个睡眠 6 秒、会自己再启动子进程的 pre-commit 钩子运行：退出码 1，不产生提交，不残留 `index.lock`，列出路径的暂存区已恢复，钩子及其子进程在命令结束时都已不存在；`EG_GIT_TIMEOUT_SECONDS=abc` 时退出码 2；源码中调用 git 时不经过 shell；路径中含空格或引号的文件能被正确提交。
+**[EG-S1-AC14]** 覆盖 EG-S1-C14：设置 `EG_GIT_TIMEOUT_SECONDS=1`，用一个睡眠 6 秒、会自己再启动子进程的 pre-commit 钩子运行：退出码 1，不产生提交，不残留 `index.lock`，列出路径的暂存区已恢复，钩子及其子进程在命令结束时都已不存在；`EG_GIT_TIMEOUT_SECONDS=abc` 或 `301` 时退出码 2；源码中调用 git 时不经过 shell；路径中含空格或引号的文件能被正确提交。
 - [EG-S1-AC14-W1] 不设超时，命令随钩子一直挂起。
 - [EG-S1-AC14-W2] 用 `subprocess.run(timeout=…)` 的缺省行为只对 git 发 SIGKILL，残留 `index.lock`，暂存区无法恢复（F-19）。
 - [EG-S1-AC14-W3] 以 `shell=True` 拼接命令字符串。
 
-**[EG-S1-AC15]** 覆盖 EG-S1-C15：预先创建 `index.lock` 并保持，运行后退出码 1、`result: error`，锁文件仍在且内容不变，未产生提交，总耗时不超过 2 秒加单次 git 调用时间；在第 2 次重试前移除锁，命令成功提交；两个 checkpoint 进程并发提交不同路径，重复 20 次，每次都满足以下不变量：退出码只为 0 或 1；任何新提交都不包含另一进程的路径；退出码为 1 的进程，其路径要么已恢复，要么列在 `message` 中；没有锁文件被删除。
+**[EG-S1-AC15]** 覆盖 EG-S1-C15：预先创建 `index.lock` 并保持，运行后退出码 1、`result: error`，锁文件仍在且内容不变，未产生提交，总耗时不超过 6 秒（提交与恢复各 2 秒的等待预算，另留 2 秒供各次 git 调用）；在第 2 次重试前移除锁，命令成功提交；两个 checkpoint 进程并发提交不同路径，重复 20 次，每次都满足以下不变量：退出码只为 0 或 1；退出码为 0 的进程报告的提交带本次运行的 `EG-Run`，且只含它自己的路径；任何新提交都不包含另一进程的路径；退出码为 1 的进程，其路径要么已恢复，要么列在 `message` 中；没有锁文件被删除。
 - [EG-S1-AC15-W1] 发现锁文件时删除它再继续。
 - [EG-S1-AC15-W2] 遇到锁时无限重试直到成功。
 - [EG-S1-AC15-W3] 遇到锁立即失败，不重试；第 2 次重试前移除锁的场景失败。
@@ -205,14 +209,16 @@ EG-Spec: <spec ID 或 ->
 | F-13 | `git show <commit>:<路径>` 的字节与提交时的文件一致 | 稳定通过 |
 | F-14 | pre-commit 钩子可中止提交 | 稳定通过 |
 | F-14b | `--no-verify` 跳过钩子 | 曾出现 1 次失败，原因未查明；本 spec 不使用 |
-| F-15 | 未配置 user.name/email 时，git 会以自动推断的身份提交已跟踪文件；`git config user.name` 为空 | 通过（v2，带对照 F-15c；旧版因 F-16 误判，已更正） |
+| F-15 | 未配置 user.name/email 时，git 会以自动推断的身份提交已跟踪文件（F-15a 断言）；`git config user.name` 为空 | 通过（v2，带对照 F-15c；旧版因 F-16 误判，已更正） |
 | F-16 | 未跟踪文件不能直接 `commit -- <路径>`，须先 `add` | 稳定通过 |
 | F-17 | `index.lock` 存在时 `git reset -- <路径>` 失败 | 通过（带对照 F-17c） |
 | F-18 | `GIT_AUTHOR_NAME` 覆盖已配置的 user.name | 通过（带对照 F-18c） |
 | F-19 | 提交阻塞在钩子中时，向进程组发 SIGTERM 不残留 `index.lock`；只对 git 发 SIGKILL 会残留 | 通过（F-19c 为对照） |
+| F-20 | `author.name` 配置覆盖 `user.name` | 通过（带对照 F-20c） |
+| F-21 | 自定义 trailer `EG-Run` 可由 `git log --format='%(trailers:key=EG-Run,valueonly)'` 读出 | 通过（带对照 F-21c） |
 
 ## 6. 实质选择
 
-已决定：K1—K7 → D-026；X1—X5 → D-027；B1 后的 Y1、Y2、Y3、Y5、Y6 → D-028，Y4 → D-029。
+已决定：K1—K7 → D-026；X1—X5 → D-027；B1 后的 Y1、Y2、Y3、Y5、Y6 → D-028，Y4 → D-029；C1 后的 Z1、Z2 → D-030。
 
 局部选择：C01（共用 EG-S2-C20 的入口行为）、C04（分支尚无提交时拒绝）。

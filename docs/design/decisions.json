@@ -200,7 +200,10 @@
       "statement": "EG-S1 身份与检查点的实质选择 K1—K7：K1 只在当前分支名以 eg/ 开头时提交，其他分支一律拒绝，不自动建 worktree；K2 只提交命令中明确列出的路径，先 add 这些路径再以 commit --only 只提交它们，绝不使用 git add -A；K3 尊重仓库钩子，钩子拦下提交时命令失败退出且不提交；K4 使用仓库已配置的 user.name 与 user.email，未配置即报错退出，不伪造身份；K5 提交命令为 eg.py checkpoint --kind <spec-freeze|tests-freeze|candidate|review|record> --path <路径>…，提交信息带 EG-Kind 与 EG-Spec 两行，输出含 commit 号与每个文件 sha256 的 JSON；K6 身份核验命令为 eg.py identity --path <路径> [--at <commit>]，给出文件在该 commit 中的 sha256 并检查工作区文件是否一致；K7 列出的路径没有改动时报错退出，不产生空提交。冻结记录的正式格式归 EG-S5。",
       "status": "active",
       "source": "dialogue.md#round-s1-k",
-      "date": "2026-10-14"
+      "date": "2026-10-14",
+      "amended_by": [
+        "D-030"
+      ]
     },
     {
       "id": "D-027",
@@ -220,7 +223,10 @@
         "D-027"
       ],
       "source": "dialogue.md#round-s1-y",
-      "date": "2026-10-14"
+      "date": "2026-10-14",
+      "amended_by": [
+        "D-030"
+      ]
     },
     {
       "id": "D-029",
@@ -230,6 +236,17 @@
         "D-015"
       ],
       "source": "dialogue.md#round-s1-y",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-030",
+      "statement": "EG-S1 C1 审查后的决定 Z1、Z2：Z1 每次 checkpoint 生成一个随机运行标识，在提交信息中增加第三行 trailer EG-Run，提交后在执行前记录的 HEAD 到当前 HEAD 之间按该标识找到本次提交，并核对它相对其父提交改动的路径恰好是本次有改动的路径，不再要求父提交等于执行前的 HEAD；Z2 检测到 author.name、author.email、committer.name、committer.email 任一项被配置即拒绝，退出码 1，并说明是哪一项。",
+      "status": "active",
+      "amends": [
+        "D-026",
+        "D-028"
+      ],
+      "source": "dialogue.md#round-s1-z",
       "date": "2026-10-14"
     }
   ]

@@ -17,7 +17,7 @@
 | ID | 严重度 | 检查项 | 摘要 | 处置 | 状态 |
 |---|---|---|---|---|---|
 | B1-01 | BLOCKER | R2 | C15"不重试"是并发选择，却引用只讲钩子的 K3 | D-028 Y1 → C15 有界重试 | VERIFIED_CLOSED（C1） |
-| B1-02 | MAJOR | R8 | 恢复命令 `git reset` 同样需要锁，并发下恢复可能失败；AC15 不可保证 | D-028 Y2 → C11 恢复与恢复失败输出；C12 提交号校验；AC15 改为不变量 | OPEN（C1：并发部分未关闭，见 C1-01） |
+| B1-02 | MAJOR | R8 | 恢复命令 `git reset` 同样需要锁，并发下恢复可能失败；AC15 不可保证 | D-028 Y2 → C11 恢复与恢复失败输出；C12 提交号校验；AC15 改为不变量 | FIX_PROPOSED（随 C1-01） |
 | B1-03 | MAJOR | R8 | 超时终止方式未定；SIGKILL 会残留锁，钩子子进程存活 | D-028 Y3 → C14 进程组 SIGTERM→SIGKILL、环境变量缩短超时；F-19 探针 | VERIFIED_CLOSED（C1） |
 | B1-04 | MAJOR | R4/R6 | 非成功输出未定义：路径错误退出码、refused/error 分界、失败 JSON、identity 对已删除文件 | D-028 Y6 → C02 退出码与检查顺序、C03、C13、新 C17 | VERIFIED_CLOSED（C1） |
 | B1-05 | MAJOR | R4/R2/R3 | F-15 为假：未配置身份时 git 会自动推断身份提交；GIT_AUTHOR_* 环境变量会覆盖身份 | F-15 v2 带对照；C05 自行检查配置 + D-028 Y5 拒绝身份环境变量；AC05-W2/W3；F-18 探针 | VERIFIED_CLOSED（C1） |
@@ -29,14 +29,15 @@
 | B1-11 | MINOR | R4 | `--message` 换行可注入 trailer；`--spec` 未校验；路径规范化与重复未定 | C10 校验 --message 单行与 --spec 字符集；C03 规范路径与重复 | VERIFIED_CLOSED（C1） |
 | B1-12 | MINOR | R7 | 影响登记漏 EG-S3 | 影响登记加 EG-S3 | VERIFIED_CLOSED（C1） |
 
-| C1-01 | MAJOR | R8/R2 | C12 要求新提交的父提交等于记录的 HEAD，并发时正确的提交被判失败（20/20）；且 Y2 不含此规则 | 交用户决定（Z1） | USER_DECISION_PENDING |
-| C1-02 | MAJOR | R3/R8 | AC15 时间上限过紧，用满 2 秒重试预算的正确实现失败（3/3）；C11 恢复是否另计预算有歧义 | 修复 | OPEN |
-| C1-03 | MINOR | R3 | F-15 探针只断言 config 为空，"会自动推断身份提交"只打印未断言 | 修复 | OPEN |
-| C1-04 | MINOR | R4 | `author.*`、`committer.*` 配置仍会覆盖 `user.*` | 交用户决定（Z2） | USER_DECISION_PENDING |
-| C1-05 | MINOR | R4 | identity 违反路径规则时的 result 与退出码未定 | 修复 | OPEN |
-| C1-06 | MINOR | R1 | `EG_GIT_TIMEOUT_SECONDS` 可调高到 300 秒以上，Y3 只允许测试缩短 | 修复 | OPEN |
+| C1-01 | MAJOR | R8/R2 | C12 要求新提交的父提交等于记录的 HEAD，并发时正确的提交被判失败（20/20）；且 Y2 不含此规则 | D-030 Z1 → C10 EG-Run trailer、C12 按运行标识找提交；AC12、AC15 更新；F-21 | FIX_PROPOSED |
+| C1-02 | MAJOR | R3/R8 | AC15 时间上限过紧，用满 2 秒重试预算的正确实现失败（3/3）；C11 恢复是否另计预算有歧义 | AC15 上限改为 6 秒并说明预算；C11、C15 写明恢复另有一份预算 | FIX_PROPOSED |
+| C1-03 | MINOR | R3 | F-15 探针只断言 config 为空，"会自动推断身份提交"只打印未断言 | F-15a 改为断言 | FIX_PROPOSED |
+| C1-04 | MINOR | R4 | `author.*`、`committer.*` 配置仍会覆盖 `user.*` | D-030 Z2 → C05 拒绝 author.*/committer.* 配置；AC05-W4；F-20 | FIX_PROPOSED |
+| C1-05 | MINOR | R4 | identity 违反路径规则时的 result 与退出码未定 | C13 规定路径违规时为 error、退出码 1；AC13 | FIX_PROPOSED |
+| C1-06 | MINOR | R1 | `EG_GIT_TIMEOUT_SECONDS` 可调高到 300 秒以上，Y3 只允许测试缩短 | C14 限定 1—300；AC14 | FIX_PROPOSED |
 
 ## 复盘候选
 
 - RC-09：F-15 探针因错误的原因通过（用未跟踪文件测身份，失败实为 F-16 所致）。探针与测试一样需要对照，证明它是因为所声称的原因通过或失败。
 - RC-10：C12 的父提交规则再次写成"依据 D-028 Y2"而 Y2 不含它（RC-03 复发）。修订时新加的规则同样要过 D-011 分流，不能挂在最近的决定上。
+- RC-11：AC12 初稿描述的 post-commit 钩子场景会无限递归（实测产生 1153 个提交）；协调者在派发前自行验证验收场景可构造，避免在最后一轮被判为不可实现。
