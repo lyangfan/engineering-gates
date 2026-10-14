@@ -1,0 +1,383 @@
+diff --git a/tests/acceptance/eg_s2/NOTES.md b/tests/acceptance/eg_s2/NOTES.md
+index fea012a..791e39c 100644
+--- a/tests/acceptance/eg_s2/NOTES.md
++++ b/tests/acceptance/eg_s2/NOTES.md
+@@ -52,3 +52,30 @@
+ - 做法：AC20 运行复制出的 `scripts/eg.py` 时，在解释器参数中加 `-X pycache_prefix=`（值为空）。CPython 3.8 起，空值的这个选项表示 `sys.pycache_prefix = None`，并且优先于环境变量和解释器内置默认值，于是项目模块的字节码只能写到源码旁的 `__pycache__`，也就是 `--root` 之内、快照覆盖的位置；标准库字节码仍写在项目外，不影响比较。`support.run_eg()` 为此增加了 `python_args` 参数，默认为空，其他测试的命令行不变。
+ - 为避免在其他解释器上悄悄退化成空测试，AC20 先用同样的参数和环境启动子解释器，确认 `sys.pycache_prefix` 为 `None`、`sys.dont_write_bytecode` 为 `False`，不满足时测试失败并提示是测试环境问题。
+ - 断言没有变：仍然只比较 `--root` 下全部目录与文件在运行前后是否一致（C20：只读，不产生包括 `__pycache__` 在内的任何文件）。
++
++## 6. 实现审查 B1 的回归测试（`test_trace_regress.py`）
++
++依据：`docs/specs/EG-S2-trace.md`（冻结版）；缺陷来源为 `docs/reviews/EG-S2/review-impl-B1.md` 中用户定性为实现错误的 IB1-01、IB1-02、IB1-03、IB1-05（IB1-04 为已知限制，不测）。既有测试与 `support.py` 未改动；新文件自带夹具变换函数。每个测试方法前的注释写明对应的 IB1 编号。
++
++| IB1 | 测试 | 依据条款 | 断言 |
++|---|---|---|---|
++| IB1-01 | `test_ac13_freeze_rejects_substantive_marker_followed_by_text` | C13、C11 | 标记后紧跟汉字或字母，`--freeze` 下退出码 1，C13 失败项指向该 spec 文件 |
++| IB1-01 | `test_ac11_substantive_marker_followed_by_text_classifies_clause` | C11 | 同上写法的 substantive 标记使条款算已归类，不带 `--freeze` 时通过 |
++| IB1-01 | `test_ac13_local_marker_followed_by_text_classifies_and_is_listed` | C11、C13 | local 标记后紧跟汉字或字母：不报 C11；`--freeze` 下该条款出现在 `local_choices` 中（条款标记与 AUTHOR-CHOICE 标记同行，避开第 1 节所述 line 的未定处） |
++| IB1-02 | `test_ac17_marker_with_prefix_outside_map_fails_without_spec` | C17、C23 | 测试文件含地图外前缀的标记（`EG-S9-AC01`）：未给 `--spec` 时 tests 模式报 C17；`--spec EG-S2` 时通过（C23 收窄不变）；spec 模式通过 |
++| IB1-02 | `test_ac17_marker_for_spec_without_file_fails_without_spec` | C17、C23 | 同上，前缀为地图中有、文件不存在的 `EG-S3` |
++| IB1-03 | `test_ac25_design_mode_accepts_any_spec_id_form` | C25、C07、C08、C09 | 见下文"同构比较" |
++| IB1-03 | `test_ac10_spec_mode_accepts_any_spec_id_form` | C25、C10、C11—C16 | 同上 |
++| IB1-03 | `test_ac17_tests_mode_accepts_any_spec_id_form` | C25、C10、C17 | 同上 |
++| IB1-03 | `test_ac23_renamed_spec_id_is_a_valid_selection` | C25、C23 | 改名后的 spec ID（如 `APP-S2`）作为 `--spec` 取值合法，spec 与 tests 模式通过 |
++| IB1-05 | `test_ac07_missing_allocation_failure_points_into_its_path` | C19、C07 | 分配表漏掉 D-003 时，C07 失败项的 `line` 要么为 null，要么是 `path` 所指文件中确实存在、且含 `D-003` 的那一行；`line` 非 null 时 `path` 不得为 null |
++
++同构比较（IB1-03）：C25 规定"地图中的 spec ID 集合以档位表第一列为准"，spec 与决定都没有规定 spec ID 的形式，因此只在 spec ID 名称上不同的两个项目，检查结果应当相同。测试对基准夹具（及其变体）先在 `EG-S1`/`EG-S2`/`EG-S3` 命名下运行并断言预期结论，再把全部文件内容与文件名中的 spec ID 替换后运行，比较两者的退出码、失败项 `(check, path, line)` 多重集合（`path` 同样替换）以及 `local_choices`。`message` 与报告的 `specs` 字段不比较（文字不受约束；`specs` 含义见第 1 节）。替换方案两种：`EG-S` → `APP-S`（派发示例），以及 `EG-S1/S2/S3/S9` → `CORE/TRACE/PROBE/EXTRA`（不带 `-S<数字>` 形状，防止只把字母前缀放宽的修复）。覆盖的情形：三种模式的通过、`--freeze` 的 local 清单、`--spec` 选择，以及分别触发 C25、C12、C10（重复条款、前缀与文件不符、文件名前缀不在地图中）、C11、C13、C14、C15、C16、C17（缺标记、未知标记）的变体。
++
++在基准候选实现（`e20e734`）上，10 个新测试全部失败：IB1-01 的标记不被识别（`--freeze` 退出码 0；条款被报 C11）；IB1-02 未给 `--spec` 时退出码 0；IB1-03 改名后的项目报 C25"档位表 spec ID 必须为全称"、C07"去向无法识别"等，`--spec APP-S2` 返回 2；IB1-05 的 `line` 为 25，而 spec 地图第 25 行是"清单版本：v1。"。
++
++本节涉及的 spec 未定处：
++
++- C19 只说 `line` 为行号、问题不对应具体行时为 null，没有明说 `line` 必须属于 `path` 所指文件；测试按"`path` 与 `line` 共同给出位置"理解，并只要求该行提到出问题的决定编号，因此 `line: null`（分配表中本无此行）与改为指向决策登记中该决定所在行两种修复都能通过。
++- IB1-02 的测试只断言未给 `--spec` 时报 C17，不断言失败项的 `path`/`line`，也不区分"地图外"与"无文件"两种原因。
++- IB1-03 中 spec ID 允许的字符集 spec 未定；测试只使用字母、数字与 `-`，且 ID 本身不含 `-C<数字>`、`-AC<数字>` 这类会与条款、验收标记产生歧义的片段。
+diff --git a/tests/acceptance/eg_s2/test_trace_regress.py b/tests/acceptance/eg_s2/test_trace_regress.py
+new file mode 100644
+index 0000000..a44ddc1
+--- /dev/null
++++ b/tests/acceptance/eg_s2/test_trace_regress.py
+@@ -0,0 +1,342 @@
++"""EG-S2 regression tests for implementation review B1 findings IB1-01, -02, -03, -05.
++
++Run: /usr/bin/python3 -B -m unittest discover -s tests/acceptance/eg_s2 -t . -v
++"""
++
++import os
++import unittest
++
++try:
++    from . import support as S
++except ImportError:  # discovered with the test directory as top level
++    import support as S
++
++
++def _with_clause(clause_text):
++    """Base fixture plus an extra EG-S2 clause C05 covered by a new AC04."""
++    fx = S.Fixture()
++    fx.add_clause(S.S2, clause_text)
++    fx.add_ac(S.S2, "**[EG-S2-AC04]** 覆盖 EG-S2-C05：描述。\n- [EG-S2-AC04-W1] 错误实现。")
++    fx.add_marker("EG-S2-AC04")
++    return fx
++
++
++# ---------------------------------------------------------------------------
++# IB1-01: AUTHOR-CHOICE markers followed directly by CJK text or letters (C11, C13)
++# ---------------------------------------------------------------------------
++
++FOLLOWERS = [
++    ("followed by CJK", "需用户决定。"),
++    ("followed by a letter", "pending."),
++]
++
++
++class AuthorChoiceFollowedByTextTests(S.TraceTestCase):
++    """C11 / C13: a marker is the exact text ``[AUTHOR-CHOICE:...]``; what follows is irrelevant."""
++
++    # eg:ac EG-S2-AC13
++    # IB1-01
++    def test_ac13_freeze_rejects_substantive_marker_followed_by_text(self):
++        for label, tail in FOLLOWERS:
++            with self.subTest(label):
++                fx = _with_clause("**[EG-S2-C05]** 依据 D-002，细节[AUTHOR-CHOICE:substantive]" + tail)
++                res = self.trace(self.build(fx), "--mode", "spec", "--freeze")
++                self.assertFail(res, "EG-S2-C13")
++                self.assertHasFailureAt(res, "EG-S2-C13", S.S2)
++
++    # eg:ac EG-S2-AC11
++    # IB1-01
++    def test_ac11_substantive_marker_followed_by_text_classifies_clause(self):
++        for label, tail in FOLLOWERS:
++            with self.subTest(label):
++                fx = _with_clause("**[EG-S2-C05]** 实质选择[AUTHOR-CHOICE:substantive]" + tail)
++                res = self.trace(self.build(fx), "--mode", "spec")
++                self.assertNoCheck(res, "EG-S2-C11")
++                self.assertPass(res)
++
++    # eg:ac EG-S2-AC11
++    # eg:ac EG-S2-AC13
++    # IB1-01
++    def test_ac13_local_marker_followed_by_text_classifies_and_is_listed(self):
++        for label, tail in FOLLOWERS:
++            with self.subTest(label):
++                clause = "**[EG-S2-C05]** 第五条，[AUTHOR-CHOICE:local]" + tail
++                fx = _with_clause(clause)
++                root = self.build(fx)
++                res = self.trace(root, "--mode", "spec")
++                self.assertNoCheck(res, "EG-S2-C11")
++                self.assertPass(res)
++
++                res = self.trace(root, "--mode", "spec", "--freeze")
++                self.assertNoCheck(res, "EG-S2-C11")
++                self.assertPass(res)
++                got = sorted(
++                    (c.get("spec"), c.get("clause"), c.get("path"), c.get("line"))
++                    for c in res.report["local_choices"]
++                )
++                # Clause marker and AUTHOR-CHOICE marker share one line (NOTES section 1).
++                want = sorted([
++                    ("EG-S1", "EG-S1-C03", S.S1, S.line_of(S.S1_TEXT, "**[EG-S1-C03]**")),
++                    ("EG-S2", "EG-S2-C04", S.S2, S.line_of(fx.files[S.S2], "**[EG-S2-C04]**")),
++                    ("EG-S2", "EG-S2-C05", S.S2, S.line_of(fx.files[S.S2], "**[EG-S2-C05]**")),
++                ])
++                self.assertEqual(got, want, res.describe())
++
++
++# ---------------------------------------------------------------------------
++# IB1-02: test markers whose spec is not in the map or has no file (C17, C23)
++# ---------------------------------------------------------------------------
++
++
++class UnknownSpecTestMarkerTests(S.TraceTestCase):
++    """C17: without --spec, every test marker must name an acceptance of an existing spec file."""
++
++    # eg:ac EG-S2-AC17
++    # IB1-02
++    def test_ac17_marker_with_prefix_outside_map_fails_without_spec(self):
++        fx = S.Fixture()
++        fx.add_marker("EG-S9-AC01")
++        root = self.build(fx)
++        # C23: with --spec only markers prefixed by a selected spec are checked.
++        self.assertPass(self.trace(root, "--mode", "tests", "--spec", "EG-S2"))
++        self.assertPass(self.trace(root, "--mode", "spec"))
++        self.assertFail(self.trace(root, "--mode", "tests"), "EG-S2-C17")
++
++    # eg:ac EG-S2-AC17
++    # IB1-02
++    def test_ac17_marker_for_spec_without_file_fails_without_spec(self):
++        # EG-S3 is in the map but has no spec file.
++        fx = S.Fixture()
++        fx.add_marker("EG-S3-AC01")
++        root = self.build(fx)
++        self.assertPass(self.trace(root, "--mode", "tests", "--spec", "EG-S2"))
++        self.assertPass(self.trace(root, "--mode", "tests", "--spec", "EG-S1", "--spec", "EG-S2"))
++        self.assertFail(self.trace(root, "--mode", "tests"), "EG-S2-C17")
++
++
++# ---------------------------------------------------------------------------
++# IB1-03: spec IDs are whatever the tier table lists (C25)
++# ---------------------------------------------------------------------------
++
++RENAMINGS = [
++    ("APP-Sn", [("EG-S", "APP-S")]),
++    ("names without -Sn", [("EG-S1", "CORE"), ("EG-S2", "TRACE"), ("EG-S3", "PROBE"), ("EG-S9", "EXTRA")]),
++]
++
++
++def _rename(text, pairs):
++    for old, new in pairs:
++        text = text.replace(old, new)
++    return text
++
++
++def _renamed(fx, pairs):
++    """Copy of ``fx`` with every spec ID replaced, in file contents and file names."""
++    out = S.deepcopy(fx)
++    out.files = {
++        _rename(rel, pairs): (None if text is None else _rename(text, pairs))
++        for rel, text in fx.files.items()
++    }
++    return out
++
++
++def _outcome(res, pairs=None):
++    """Exit code, failures as (check, path, line), and local choices, with paths renamed."""
++    def path(p):
++        return _rename(p, pairs) if (pairs and isinstance(p, str)) else p
++
++    failures = sorted(
++        (f.get("check"), str(path(f.get("path"))), str(f.get("line"))) for f in res.failures
++    )
++    local = sorted(
++        (str(path(c.get("spec"))), str(path(c.get("clause"))), str(path(c.get("path"))), str(c.get("line")))
++        for c in res.report["local_choices"]
++    )
++    return res.code, failures, local
++
++
++def _dup_clause(fx):
++    fx.add_clause(S.S2, "**[EG-S2-C01]** 重复的条款（D-002）。")
++
++
++def _foreign_clause_prefix(fx):
++    fx.add_clause(S.S2, "**[EG-S3-C05]** 前缀与文件不符（D-002）。")
++
++
++def _file_prefix_not_in_map(fx):
++    fx.files["docs/specs/EG-S9-extra.md"] = "# 多余的 spec\n"
++
++
++def _coverage_of_unknown_clause(fx):
++    fx.add_ac(S.S2, "**[EG-S2-AC04]** 覆盖 EG-S2-C99：描述。\n- [EG-S2-AC04-W1] 错误实现。")
++    fx.add_marker("EG-S2-AC04")
++
++
++def _uncovered_clause(fx):
++    fx.add_clause(S.S2, "**[EG-S2-C05]** 没有验收覆盖的条款（D-002）。")
++
++
++def _misplaced_wrong_impl(fx):
++    fx.edit(
++        S.S2,
++        "- [EG-S2-AC02-W2] 错误实现二。\n",
++        "- [EG-S2-AC02-W2] 错误实现二。\n- [EG-S2-AC01-W2] 放错位置的错误实现。\n",
++    )
++
++
++def _unclassified_clause(fx):
++    fx.add_clause(S.S2, "**[EG-S2-C05]** 没有任何引用的条款。")
++    fx.add_ac(S.S2, "**[EG-S2-AC04]** 覆盖 EG-S2-C05：描述。\n- [EG-S2-AC04-W1] 错误实现。")
++    fx.add_marker("EG-S2-AC04")
++
++
++def _substantive_left(fx):
++    fx.add_clause(S.S2, "**[EG-S2-C05]** 实质选择尚未决定。[AUTHOR-CHOICE:substantive]")
++    fx.add_ac(S.S2, "**[EG-S2-AC04]** 覆盖 EG-S2-C05：描述。\n- [EG-S2-AC04-W1] 错误实现。")
++    fx.add_marker("EG-S2-AC04")
++
++
++def _missing_test_marker(fx):
++    fx.remove_marker("EG-S2-AC03")
++
++
++def _unknown_test_marker(fx):
++    fx.add_marker("EG-S2-AC99")
++
++
++def _checklist_column_not_in_tier_table(fx):
++    fx.edit(S.SPEC_MAP, S.TIER_ROW_S3 + "\n", "")
++    fx.edit(S.SPEC_MAP, "| D-003 | EG-S3 |\n", "| D-003 | 不进 spec：夹具 |\n")
++
++
++def _unreferenced_allocation(fx):
++    fx.edit(S.SPEC_MAP, "| D-002 | EG-S2（地图字段） |", "| D-002 | EG-S1、EG-S2（地图字段） |")
++
++
++# (label, mode args, mutation or None, check the EG-Sn fixture must report or None for pass)
++CASES = [
++    ("design pass", ["--mode", "design"], None, None),
++    ("spec pass", ["--mode", "spec"], None, None),
++    ("tests pass", ["--mode", "tests"], None, None),
++    ("freeze local choices", ["--mode", "spec", "--freeze"], None, None),
++    ("spec selected", ["--mode", "spec", "--spec", "EG-S2"], None, None),
++    ("C25 checklist column not in tier table", ["--mode", "design"], _checklist_column_not_in_tier_table, "EG-S2-C25"),
++    ("C12 allocated decision not cited", ["--mode", "spec"], _unreferenced_allocation, "EG-S2-C12"),
++    ("C10 duplicate clause", ["--mode", "spec"], _dup_clause, "EG-S2-C10"),
++    ("C10 clause prefix differs from file", ["--mode", "spec"], _foreign_clause_prefix, "EG-S2-C10"),
++    ("C10 file prefix not in map", ["--mode", "tests"], _file_prefix_not_in_map, "EG-S2-C10"),
++    ("C11 unclassified clause", ["--mode", "spec"], _unclassified_clause, "EG-S2-C11"),
++    ("C13 substantive under freeze", ["--mode", "spec", "--freeze"], _substantive_left, "EG-S2-C13"),
++    ("C14 coverage of unknown clause", ["--mode", "spec"], _coverage_of_unknown_clause, "EG-S2-C14"),
++    ("C15 uncovered clause", ["--mode", "spec"], _uncovered_clause, "EG-S2-C15"),
++    ("C16 misplaced wrong implementation", ["--mode", "spec"], _misplaced_wrong_impl, "EG-S2-C16"),
++    ("C17 missing test marker", ["--mode", "tests"], _missing_test_marker, "EG-S2-C17"),
++    ("C17 unknown test marker", ["--mode", "tests"], _unknown_test_marker, "EG-S2-C17"),
++]
++
++
++class SpecIdFormTests(S.TraceTestCase):
++    """C25: the spec ID set is the tier table's first column; no ID shape is prescribed.
++
++    A project whose spec IDs differ from the base fixture only by name must get the
++    same exit code, the same (check, path, line) failures and the same local choices.
++    """
++
++    def _compare(self, label, args, mutate, expect, pairs):
++        fx = S.Fixture()
++        if mutate is not None:
++            mutate(fx)
++        eg_res = self.trace(self.build(fx), *args)
++        if expect is None:
++            self.assertPass(eg_res)
++        else:
++            self.assertFail(eg_res, expect)
++
++        renamed_args = [_rename(a, pairs) for a in args]
++        other = self.trace(self.build(_renamed(fx, pairs)), *renamed_args)
++        self.assertEqual(
++            _outcome(other),
++            _outcome(eg_res, pairs),
++            "%s: renamed project differs from EG-Sn project\n--- EG-Sn ---\n%s\n--- renamed ---\n%s"
++            % (label, eg_res.describe(), other.describe()),
++        )
++
++    # eg:ac EG-S2-AC25
++    # IB1-03
++    def test_ac25_design_mode_accepts_any_spec_id_form(self):
++        for name, pairs in RENAMINGS:
++            for label, args, mutate, expect in CASES:
++                if args[1] != "design":
++                    continue
++                with self.subTest(name + ": " + label):
++                    self._compare(label, args, mutate, expect, pairs)
++
++    # eg:ac EG-S2-AC10
++    # eg:ac EG-S2-AC14
++    # eg:ac EG-S2-AC16
++    # IB1-03
++    def test_ac10_spec_mode_accepts_any_spec_id_form(self):
++        for name, pairs in RENAMINGS:
++            for label, args, mutate, expect in CASES:
++                if args[1] != "spec":
++                    continue
++                with self.subTest(name + ": " + label):
++                    self._compare(label, args, mutate, expect, pairs)
++
++    # eg:ac EG-S2-AC17
++    # IB1-03
++    def test_ac17_tests_mode_accepts_any_spec_id_form(self):
++        for name, pairs in RENAMINGS:
++            for label, args, mutate, expect in CASES:
++                if args[1] != "tests":
++                    continue
++                with self.subTest(name + ": " + label):
++                    self._compare(label, args, mutate, expect, pairs)
++
++    # eg:ac EG-S2-AC23
++    # IB1-03
++    def test_ac23_renamed_spec_id_is_a_valid_selection(self):
++        for name, pairs in RENAMINGS:
++            with self.subTest(name):
++                root = self.build(_renamed(S.Fixture(), pairs))
++                for mode in ("spec", "tests"):
++                    self.assertPass(self.trace(root, "--mode", mode, "--spec", _rename("EG-S2", pairs)))
++
++
++# ---------------------------------------------------------------------------
++# IB1-05: C07 "decision missing from the allocation table" location (C19)
++# ---------------------------------------------------------------------------
++
++
++class AllocationLocationTests(S.TraceTestCase):
++    """C19: ``line`` is a line of the file named by ``path`` (or null)."""
++
++    # eg:ac EG-S2-AC07
++    # eg:ac EG-S2-AC19
++    # IB1-05
++    def test_ac07_missing_allocation_failure_points_into_its_path(self):
++        fx = S.Fixture()
++        fx.edit(S.SPEC_MAP, "| D-003 | EG-S3 |\n", "")
++        root = self.build(fx)
++        res = self.trace(root, "--mode", "design")
++        self.assertFail(res, "EG-S2-C07")
++        hits = [f for f in res.failures if f.get("check") == "EG-S2-C07"]
++        for item in hits:
++            path, line = item.get("path"), item.get("line")
++            if line is None:
++                continue
++            self.assertIsNotNone(path, "a line number needs a path\n" + res.describe())
++            full = os.path.join(str(root), path)
++            self.assertTrue(os.path.isfile(full), "path is not a file\n" + res.describe())
++            with open(full, encoding="utf-8-sig") as fh:
++                lines = fh.read().split("\n")
++            self.assertLessEqual(line, len(lines), "line beyond end of %s\n%s" % (path, res.describe()))
++            self.assertIn(
++                "D-003",
++                lines[line - 1],
++                "line %d of %s does not refer to D-003\n%s" % (line, path, res.describe()),
++            )
++
++
++if __name__ == "__main__":
++    unittest.main()
