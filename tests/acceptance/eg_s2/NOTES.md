@@ -52,3 +52,30 @@
 - 做法：AC20 运行复制出的 `scripts/eg.py` 时，在解释器参数中加 `-X pycache_prefix=`（值为空）。CPython 3.8 起，空值的这个选项表示 `sys.pycache_prefix = None`，并且优先于环境变量和解释器内置默认值，于是项目模块的字节码只能写到源码旁的 `__pycache__`，也就是 `--root` 之内、快照覆盖的位置；标准库字节码仍写在项目外，不影响比较。`support.run_eg()` 为此增加了 `python_args` 参数，默认为空，其他测试的命令行不变。
 - 为避免在其他解释器上悄悄退化成空测试，AC20 先用同样的参数和环境启动子解释器，确认 `sys.pycache_prefix` 为 `None`、`sys.dont_write_bytecode` 为 `False`，不满足时测试失败并提示是测试环境问题。
 - 断言没有变：仍然只比较 `--root` 下全部目录与文件在运行前后是否一致（C20：只读，不产生包括 `__pycache__` 在内的任何文件）。
+
+## 6. 实现审查 B1 的回归测试（`test_trace_regress.py`）
+
+依据：`docs/specs/EG-S2-trace.md`（冻结版）；缺陷来源为 `docs/reviews/EG-S2/review-impl-B1.md` 中用户定性为实现错误的 IB1-01、IB1-02、IB1-03、IB1-05（IB1-04 为已知限制，不测）。既有测试与 `support.py` 未改动；新文件自带夹具变换函数。每个测试方法前的注释写明对应的 IB1 编号。
+
+| IB1 | 测试 | 依据条款 | 断言 |
+|---|---|---|---|
+| IB1-01 | `test_ac13_freeze_rejects_substantive_marker_followed_by_text` | C13、C11 | 标记后紧跟汉字或字母，`--freeze` 下退出码 1，C13 失败项指向该 spec 文件 |
+| IB1-01 | `test_ac11_substantive_marker_followed_by_text_classifies_clause` | C11 | 同上写法的 substantive 标记使条款算已归类，不带 `--freeze` 时通过 |
+| IB1-01 | `test_ac13_local_marker_followed_by_text_classifies_and_is_listed` | C11、C13 | local 标记后紧跟汉字或字母：不报 C11；`--freeze` 下该条款出现在 `local_choices` 中（条款标记与 AUTHOR-CHOICE 标记同行，避开第 1 节所述 line 的未定处） |
+| IB1-02 | `test_ac17_marker_with_prefix_outside_map_fails_without_spec` | C17、C23 | 测试文件含地图外前缀的标记（`EG-S9-AC01`）：未给 `--spec` 时 tests 模式报 C17；`--spec EG-S2` 时通过（C23 收窄不变）；spec 模式通过 |
+| IB1-02 | `test_ac17_marker_for_spec_without_file_fails_without_spec` | C17、C23 | 同上，前缀为地图中有、文件不存在的 `EG-S3` |
+| IB1-03 | `test_ac25_design_mode_accepts_any_spec_id_form` | C25、C07、C08、C09 | 见下文"同构比较" |
+| IB1-03 | `test_ac10_spec_mode_accepts_any_spec_id_form` | C25、C10、C11—C16 | 同上 |
+| IB1-03 | `test_ac17_tests_mode_accepts_any_spec_id_form` | C25、C10、C17 | 同上 |
+| IB1-03 | `test_ac23_renamed_spec_id_is_a_valid_selection` | C25、C23 | 改名后的 spec ID（如 `APP-S2`）作为 `--spec` 取值合法，spec 与 tests 模式通过 |
+| IB1-05 | `test_ac07_missing_allocation_failure_points_into_its_path` | C19、C07 | 分配表漏掉 D-003 时，C07 失败项的 `line` 要么为 null，要么是 `path` 所指文件中确实存在、且含 `D-003` 的那一行；`line` 非 null 时 `path` 不得为 null |
+
+同构比较（IB1-03）：C25 规定"地图中的 spec ID 集合以档位表第一列为准"，spec 与决定都没有规定 spec ID 的形式，因此只在 spec ID 名称上不同的两个项目，检查结果应当相同。测试对基准夹具（及其变体）先在 `EG-S1`/`EG-S2`/`EG-S3` 命名下运行并断言预期结论，再把全部文件内容与文件名中的 spec ID 替换后运行，比较两者的退出码、失败项 `(check, path, line)` 多重集合（`path` 同样替换）以及 `local_choices`。`message` 与报告的 `specs` 字段不比较（文字不受约束；`specs` 含义见第 1 节）。替换方案两种：`EG-S` → `APP-S`（派发示例），以及 `EG-S1/S2/S3/S9` → `CORE/TRACE/PROBE/EXTRA`（不带 `-S<数字>` 形状，防止只把字母前缀放宽的修复）。覆盖的情形：三种模式的通过、`--freeze` 的 local 清单、`--spec` 选择，以及分别触发 C25、C12、C10（重复条款、前缀与文件不符、文件名前缀不在地图中）、C11、C13、C14、C15、C16、C17（缺标记、未知标记）的变体。
+
+在基准候选实现（`e20e734`）上，10 个新测试全部失败：IB1-01 的标记不被识别（`--freeze` 退出码 0；条款被报 C11）；IB1-02 未给 `--spec` 时退出码 0；IB1-03 改名后的项目报 C25"档位表 spec ID 必须为全称"、C07"去向无法识别"等，`--spec APP-S2` 返回 2；IB1-05 的 `line` 为 25，而 spec 地图第 25 行是"清单版本：v1。"。
+
+本节涉及的 spec 未定处：
+
+- C19 只说 `line` 为行号、问题不对应具体行时为 null，没有明说 `line` 必须属于 `path` 所指文件；测试按"`path` 与 `line` 共同给出位置"理解，并只要求该行提到出问题的决定编号，因此 `line: null`（分配表中本无此行）与改为指向决策登记中该决定所在行两种修复都能通过。
+- IB1-02 的测试只断言未给 `--spec` 时报 C17，不断言失败项的 `path`/`line`，也不区分"地图外"与"无文件"两种原因。
+- IB1-03 中 spec ID 允许的字符集 spec 未定；测试只使用字母、数字与 `-`，且 ID 本身不含 `-C<数字>`、`-AC<数字>` 这类会与条款、验收标记产生歧义的片段。
