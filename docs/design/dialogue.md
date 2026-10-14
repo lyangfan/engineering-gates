@@ -274,6 +274,7 @@ C1 审查（新会话，临时仓库实测）裁定 FAIL：B1 关闭 11/12；v0.
 | Q-11 | 状态文件与跨 harness 续跑；AGENTS.md / CLAUDE.md / Cursor / Codex 入口适配 | 已关闭（D-018） |
 | Q-12 | 复盘、经验沉淀，以及流程自身的回归验证（埋雷题库） | 已关闭（D-019） |
 | Q-13 | 与 science-gates 的关系：共享哪些机械实现 | 已关闭（D-020） |
+| Q-14 | GitHub PR 集成：PR 粒度、合并方式与 commit 身份保留（squash/rebase 会使 D-015 引用的提交失效，需 merge commit 或冻结点 tag）、推送授权范围、CI 必过检查、归属 spec（EG-S6 或新 EG-S8） | 待讨论（用户决定在 EG-S1、EG-S2 实现完成后讨论；可能触发 EG-S1 的 D-017 变更判断） |
 
 ### EG-S1 冻结与阶段 6 启动 {#s1-frozen}
 
