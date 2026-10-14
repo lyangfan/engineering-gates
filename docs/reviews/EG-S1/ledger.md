@@ -72,6 +72,8 @@ AC09-W1"不带 `--only` 的 `git commit`"在给出路径时等同于 `--only`，
 
 预算：严格档 1 Baseline + 2 Closure。检查表 `checklist-impl.md`（I1—I8）冻结于 `0d57ac5`；受审 commit `0d57ac5`（`eg.py` 与 `egcheckpoint/` 同候选 `d499fe4`）；派发 `dispatch-impl-review-B1.md`。
 
+- B1 第 1 次尝试：用户要求中止（2026-10-14），审查者未写报告；协调者清理了其临时 worktree。未产生裁定，不计入轮次预算。
+
 ## 冻结后待办（编辑性，不改 EG-S1 冻结字节）
 
 - C11：改为"若 C08 的 `add` 已返回成功"（C2-01）。
