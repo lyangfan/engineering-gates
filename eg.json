@@ -1,0 +1,8 @@
+{
+  "schema": "eg-config/v1",
+  "decisions": "docs/design/decisions.json",
+  "design": ["docs/design/design-v2.md"],
+  "spec_map": "docs/design/spec-map.md",
+  "specs": ["docs/specs/*.md"],
+  "tests": ["tests/acceptance/**/*.py"]
+}
