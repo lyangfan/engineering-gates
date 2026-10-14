@@ -283,3 +283,7 @@ EG-S1 经 B1 FAIL → C1 FAIL → C2 PASS 冻结于 commit `3955513`（严格档
 ### 同步到 GitHub {#github-sync}
 
 用户授权把仓库同步到 `github.com/lyangfan/engineering-gates`（公开仓库，用户已把名字从 `engineering_gates` 改为 `engineering-gates`）。远端原有一个 GitHub 自动生成的 `Initial commit`（只含 LICENSE），与本地历史无共同祖先。为不覆盖远端、也不改写本地提交号（D-015 的身份引用依赖它们），在 `main` 上以 `--allow-unrelated-histories` 合并远端历史，得到 `49a9ca2`；LICENSE 冲突按用户选择采用远端版本（版权人 `lyangfan`）。推送 `main` 与 `eg/v2`，未使用强制推送；冻结记录引用的提交均保留在 `eg/v2` 上。Q-14 的其余问题仍待讨论。
+
+### 角色与模型 {#round-models}
+
+用户问能否为子 agent 指定模型，随后指示：后续实现中作者用一般模型 Grok 4.7，思考程度最高，禁用 Fast 模式。协调者理解为阶段 7 的实现者（EG-S1、EG-S2 均适用），审查者、协调者、测试作者仍用默认模型。提醒：EG-S1 为严格档，此前建议实现者为"中到高"；以冻结测试、补丁检查与阶段 8 审查兜底，若实现反复不收敛，停下交用户决定，不自行换模型。→ D-031。
