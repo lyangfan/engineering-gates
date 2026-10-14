@@ -1,0 +1,61 @@
+{
+  "schema": "eg-freeze-record/draft",
+  "spec_id": "EG-S2",
+  "tier": "标准",
+  "verdict_chain": [
+    "B1:FAIL",
+    "C1:PASS",
+    "R1:PASS"
+  ],
+  "frozen_on": "2026-10-14",
+  "identity_kind": "sha256（项目尚未纳入 git，D-015 未落地）",
+  "files": {
+    "spec": {
+      "path": "docs/specs/EG-S2-trace.md",
+      "sha256": "97c744d7200ee358f9eb73c708cc870db5f22e02de1a3138e79497c08005fe62"
+    },
+    "checklist": {
+      "path": "docs/reviews/EG-S2/checklist.md",
+      "sha256": "de1740e902adff02a17cde090924c25bf770cf97e7936e86025e6230a12afcea"
+    },
+    "review_B1": {
+      "path": "docs/reviews/EG-S2/review-B1.md",
+      "sha256": "2e5b5e2ee7c014d8921696b3d3ced0a1bb6562514ebbe93f21fc5eb482ed37e4"
+    },
+    "review_C1": {
+      "path": "docs/reviews/EG-S2/review-C1.md",
+      "sha256": "03d1449ac4c88c390d261ae3809a60e75705e72f4f84d27f5a9a8b6a0ee9526d"
+    },
+    "review_R1": {
+      "path": "docs/reviews/EG-S2/review-R1.md",
+      "sha256": "56bb9184ec605cc3c36fb5ab2fb18589ce7743dd637cd427e39bdc85b1667ad0"
+    },
+    "decisions": {
+      "path": "docs/design/decisions.json",
+      "sha256": "269cb144cc204012876fc5f19ca17d6632f68209b6b162b2443636ae70aad5f3"
+    },
+    "design": {
+      "path": "docs/design/design-v2.md",
+      "sha256": "755119802b77e920699efc5a1fd394976df029b3fe0e791fb1898ae50ee058b5"
+    },
+    "spec_map": {
+      "path": "docs/design/spec-map.md",
+      "sha256": "1174abe3c6d4022822824b4f34ba717fb6518c29f99405754250d20b15503b81"
+    },
+    "subject_v0_4": {
+      "path": "docs/reviews/EG-S2/subject/EG-S2-trace.v0.4.md",
+      "sha256": "53c017ca25d016a1e9f895af40aec1c14f30ddcf32c68633798ddfda2d35d280"
+    },
+    "subject_v0_5": {
+      "path": "docs/reviews/EG-S2/subject/EG-S2-trace.v0.5.md",
+      "sha256": "97c744d7200ee358f9eb73c708cc870db5f22e02de1a3138e79497c08005fe62"
+    },
+    "diff_v0_4_v0_5": {
+      "path": "docs/reviews/EG-S2/subject/v0.4-to-v0.5.diff",
+      "sha256": "745bafd6c1a8ec7d80bfefce14de3120bc4b4dfa83ff14a884fbf4d2a6af98cf"
+    }
+  },
+  "accepted_minor": [
+    "R1-01"
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "schema": "eg-decisions/v1",
+  "decisions": [
+    {
+      "id": "D-001",
+      "statement": "扩展 engineering-gates，使其覆盖完整链路：问答 → 决策 → 设计稿 → spec → 实现 → 审查；不另建上游 skill。",
+      "status": "active",
+      "source": "dialogue.md#round-0",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-002",
+      "statement": "流程按风险分为轻量 / 标准 / 严格三档，在切分 spec 时为每份 spec 确定档位。各档具体差异待定。",
+      "status": "active",
+      "source": "dialogue.md#round-0",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-003",
+      "statement": "验收测试由独立的测试作者只依据 spec 先行编写；实现者不得修改这些测试。测试作者介入时点、可见材料和测试自身有误时的反馈路径待定。",
+      "status": "active",
+      "source": "dialogue.md#round-0",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-004",
+      "statement": "不强制审查者与实现者使用不同模型家族；独立会话（不继承实现上下文）即满足独立性要求。",
+      "status": "active",
+      "source": "dialogue.md#round-0",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-005",
+      "statement": "先用本流程设计流程自身：通过逐题问答形成 v2 设计稿，再进入 spec 与实现。",
+      "status": "active",
+      "source": "dialogue.md#round-0",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-006",
+      "statement": "决策登记是已确认决定的唯一权威；讨论记录只用于追溯来源。设计稿手写叙述，每段标注所依据的决定编号。脚本做双向机械检查：每条 active 决定至少被设计稿引用一次；设计稿引用的编号必须存在且为 active；引用 superseded 或 withdrawn 决定即报错。引用是否忠实于决定内容不由脚本判断，交审查者判断。",
+      "status": "active",
+      "source": "dialogue.md#round-1",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-007",
+      "statement": "流程采用九阶段骨架：1 问答决策、2 设计稿、3 切分与定档、4 写 spec（含现实核验）、5 审 spec、6 测试先行、7 实现、8 审实现、9 复盘。独立审查只设在阶段 5 和阶段 8；阶段 2 和阶段 3 以机械检查加用户确认放行；其余阶段以各自的机械退出检查放行。各阶段细节由后续问题确定；测试的冻结时点与审查归属留给 Q-07，可调整阶段 5 与 6 的关系。",
+      "status": "active",
+      "amended_by": ["D-009"],
+      "source": "dialogue.md#round-2",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-008",
+      "statement": "档位按触碰面判定，使用带版本号的固定是/否清单：公共 API/wire、持久化 schema 或身份、并发/提交点/恢复、权限/安全/外部副作用、其他 spec 拥有的合同或公共登记表、未核验的外部行为。任一为\"是\"进严格档；全为\"否\"时，新增用户可见行为进标准档，否则进轻量档。每个\"是\"必须指向 spec 中的具体条款。Agent 在切分时提议档位，用户确认；用户可上调，下调须写明理由。清单漏项通过复盘（Q-12）补充并升版本。",
+      "status": "active",
+      "source": "dialogue.md#round-3",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-009",
+      "statement": "三档差异：spec 形式——轻量为一页卡片（目标、引用决定编号的条款、附\"必须失败的错误实现\"的验收），标准为带稳定条款 ID 的完整 spec，严格另加影响登记与迁移说明；现实核验——轻量不要求，标准实测所用依赖行为，严格实测并钉版本、核验脚本存档；测试作者——三档均独立（D-003）；测试证明力——轻量要求测试在当前代码上先失败，标准另要求把 spec 中每个\"错误实现\"做成补丁后测试必须失败，严格再加崩溃/并发/超时故障注入；独立审查——轻量在实现后做一次合并审查（spec 卡片、测试、代码一起），不通过即升为标准档；标准与严格在阶段 5、8 各一次，严格的检查表另加跨 spec 影响项；用户确认点——轻量为定档与最终验收，标准为定档、spec 冻结与实现 PASS，严格另加影响登记确认。轮次预算由 Q-09 决定；错误实现补丁的作者与时点由 Q-07 决定。",
+      "status": "active",
+      "amends": ["D-007"],
+      "source": "dialogue.md#round-3b",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-010",
+      "statement": "追溯链采用内联标注：spec 条款带稳定 ID 并引用决定编号，验收带 ID、注明覆盖的条款与错误实现，测试以与语言无关的标记引用验收 ID；不另设手工维护的追溯矩阵，需要矩阵时由脚本从内容生成。脚本检查：分给该 spec 的每条 active 决定至少被一个条款引用；每个条款至少有一条验收；每条验收至少写一个错误实现并至少有一个带其标记的测试；测试标记引用不存在的 ID 即报错；标准档与严格档另检查每个错误实现补丁打上后，带对应标记的测试必须失败。标记语法在实现 spec 时确定；条款未引用决定的处理由 Q-05 决定。",
+      "status": "active",
+      "source": "dialogue.md#round-4",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-011",
+      "statement": "每个 spec 条款必须归入三类之一：引用决定（D-xxx）、引用事实证据（F-xxx，来自现实核验，见 Q-06）、或标为 AUTHOR-CHOICE。AUTHOR-CHOICE 若碰到 D-008 清单中的任一触碰面即为实质选择，必须在冻结前逐条交用户决定并登记为新决定；其余为局部选择，冻结时列成清单交用户过目。审查者须确认局部选择确属局部，发现实质选择被标为局部即为阻塞级问题。",
+      "status": "active",
+      "source": "dialogue.md#round-5",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-012",
+      "statement": "现实核验的证据是事实登记中的 F-xxx 条目，每条包含一句话陈述、钉住的依赖版本、可执行探针命令和期望结果断言。探针在写 spec 时、实现开始前、审实现前各运行一次；任一次失败即按依赖漂移处理：停止并回到 spec。适用范围按 D-009：轻量不要求，标准与严格要求。",
+      "status": "active",
+      "source": "dialogue.md#round-6",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-013",
+      "statement": "独立测试作者编写的是针对 spec 所定义对外接口的验收测试；实现者可自由补充单元测试，但不作为验收证据。测试作者可见 spec、事实登记和实现开始前的代码库版本，不可见实现者会话与进行中的代码；实现者只读可见验收测试。标准档与严格档中，测试作者在实现完成后第二次介入，依据 spec 中的错误实现描述在候选代码上编写补丁；脚本逐个应用补丁并运行带对应标记的测试，每个补丁都必须使测试失败；审查者核对补丁是否忠实于错误实现描述。",
+      "status": "active",
+      "refines": ["D-003", "D-009"],
+      "source": "dialogue.md#round-7",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-014",
+      "statement": "验收测试在阶段 6 结束时冻结（记录 commit）。实现者认为某个验收测试有误时，提交测试异议（测试 ID、对应条款、理由），被异议测试暂时搁置，其余工作继续。测试作者以新会话裁定：认同则修改测试并产生带记录的新版本；不认同而实现者坚持时，判定为 spec 歧义或遗漏，回到 spec 由用户决定。阶段 8 审查者核对每条异议的处理。测试本身不另设独立审查门，由阶段 8（轻量档为合并审查）一并审查。",
+      "status": "active",
+      "source": "dialogue.md#round-7b",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-015",
+      "statement": "LLM 永远不计算、不抄写 hash；所有身份与清单由脚本生成和校验，审查材料只引用脚本输出的身份。git commit 是流程内产物的唯一身份：采用本流程即授权在流程专用工作分支或 worktree 上由脚本做本地检查点提交（spec 冻结、测试冻结、候选实现、审查报告等）；push、merge、发布仍须用户逐次授权。不在 git 中的外部大文件只记录 sha256 与不可变来源。",
+      "status": "active",
+      "source": "dialogue.md#round-8",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-016",
+      "statement": "独立审查的检查表只包含机器无法判断的问题（条款对决定的忠实性、局部选择是否确属局部、补丁对错误实现描述的忠实性、遗漏的失败路径等），在审查开始前冻结；Closure 只审改动影响范围，不新增评价标准；每条阻塞 finding 必须映射一个检查项并给出反例。Closure 可由新会话执行，输入为前序报告与账本，不依赖 harness 恢复上下文。轮次预算按档：轻量 1 轮（不通过即按 D-009 升档）、标准 1 Baseline + 1 Closure、严格 1 Baseline + 2 Closure。预算耗尽仍有阻塞项时判为 NON_CONVERGENT：脚本按根因归类剩余 finding，用户选择重置方式（新 Baseline、回到 spec、拆分 spec、或接受限制后继续）。",
+      "status": "active",
+      "source": "dialogue.md#round-9",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-017",
+      "statement": "冻结后的 spec 变更由脚本对比新旧条款 ID 后分三级，级别由 agent 提议、用户确认，用户可上调：编辑性（条款与验收语义不变）只做机械检查并记录；局部（改动条款不碰 D-008 触碰面）按轻量档做一次合并审查，范围为改动条款、受影响验收与测试、对应代码；实质（碰到触碰面或其他 spec）按该 spec 原档位重审改动影响范围，脚本列出受影响的其他 spec 并逐份判断是否跟进。冻结后只改代码、不改 spec 的修复：先跑全部验收测试与补丁检查，再做一次轻量单轮审查。",
+      "status": "active",
+      "source": "dialogue.md#round-10",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-018",
+      "statement": "流程规则以一份压缩后的完整协议交付（目标约 300 行），配合状态文件；由 LLM 依据协议自行判断下一步并更新状态。状态文件中的阶段、未关闭事项、阻塞点由 LLM 写；身份字段（commit、sha256）只由脚本写（D-015）。各阶段的机械检查仍由脚本执行（D-006、D-010、D-012、D-013），脚本不驱动流程走向。AGENTS.md、CLAUDE.md、.cursor/rules、Codex SKILL.md 等入口文件只路由到同一份协议，不做各 harness 的原生实现。",
+      "status": "active",
+      "source": "dialogue.md#round-11",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-019",
+      "statement": "每份 spec 周期结束时复盘：脚本按根因汇总本周期 finding，agent 提出升级建议（新增机械检查、检查项、协议措辞或 D-008 清单项），用户确认后以新版本生效，周期内不变（D-016）。建立埋雷题库：从真实历史缺陷构造带已知缺陷的 spec 或代码及其应被抓到的 finding，首批约 10 题（取自 science_agent）。协议、检查表或清单升版本前须在题库上运行并比较新旧版本的抓到率与误报；更换模型或 harness 时用同一题库衡量遵从度。",
+      "status": "active",
+      "source": "dialogue.md#round-12",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-020",
+      "statement": "engineering-gates 与 science-gates 保持独立，不共享代码，各自可单独复制安装；v2 稳定后在复盘（D-019）中重新评估是否抽取共享机械库。",
+      "status": "active",
+      "source": "dialogue.md#round-13",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-021",
+      "statement": "流程中由机器读写的文件（决策登记、配置、事实登记、状态文件等）使用 JSON，脚本只依赖 Python 标准库；面向用户阅读与确认的文件（设计稿、spec、spec 地图）使用 Markdown。",
+      "status": "active",
+      "source": "dialogue.md#round-s2-p",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-022",
+      "statement": "追溯写法与入口：决定状态只取 active、superseded、withdrawn（\"某事后置\"本身是 active 决定）；条款写作 **[<SPEC>-Cnn]**，验收写作 **[<SPEC>-ACnn]**，错误实现写作 [<SPEC>-ACnn-Wn]，决定与事实引用直接写在正文中；测试标记为任意位置出现的 eg:ac <验收 ID>；统一入口为 python3 scripts/eg.py，追溯检查为 trace 子命令，带 --mode design|spec|tests 与 --freeze；退出码 0 通过、1 检查失败、2 用法或输入错误，JSON 报告写到标准输出；项目根目录配置文件 eg.json 声明决策登记、设计稿、spec 地图、spec 文件与测试文件的位置；spec 地图保持 Markdown 表格。",
+      "status": "active",
+      "amended_by": ["D-023"],
+      "source": "dialogue.md#round-s2-p",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-023",
+      "statement": "trace 子命令增加可重复的 --spec <ID> 参数：spec 与 tests 模式下，条款、验收、冻结与测试标记检查只作用于选中的 spec；未给出时作用于全部文件已存在的 spec。使多份 spec 可以处于不同阶段并行推进。",
+      "status": "active",
+      "amends": ["D-022"],
+      "source": "dialogue.md#round-s2-b1",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-024",
+      "statement": "采纳 EG-S2 v0.3 格式包 F1—F8：F1 决策登记 schema（必需与可选字段、id 至少三位数字、关系引用存在且不自引、supersedes 无环且与 superseded 状态双向一致、amends 与 amended_by 成对）；F2 AUTHOR-CHOICE 标记只有 local 与 substantive 两种写法；F3 设计稿与 spec 中行内代码和围栏代码块不参与引用与标记识别，测试文件除外；F4 eg.json 恰含 schema、decisions、design、spec_map、specs、tests 六键，路径相对于 eg.json 所在目录且不得为绝对路径或含 ..，匹配采用 glob 递归语义；F5 spec 文件名以 spec ID 开头，文件内标记前缀等于所属 spec ID；F6 spec 地图三张表按标题\"决定分配\"\"定档清单\"\"档位\"定位，spec ID 用全称，\"全局约束\"说明中的 spec ID 不计为分配；F7 条款与验收块到下一个标记或标题为止，覆盖只取\"覆盖 <ID>：\"声明，错误实现按所在验收块归属，验收与错误实现 ID 唯一；F8 退出码 2 只用于配置、文件不可读与登记顶层非法，其余为 1，允许 BOM，零匹配为失败，标准输出只写一个 JSON 报告，可读摘要写到标准错误。具体条文以 EG-S2 中引用本决定的条款为准。",
+      "status": "active",
+      "source": "dialogue.md#round-s2-pkg",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-025",
+      "statement": "trace 子命令保留 --root <目录> 参数，指定 eg.json 所在的项目根目录，缺省为当前目录。",
+      "status": "active",
+      "source": "dialogue.md#round-s2-c1",
+      "date": "2026-10-14"
+    }
+  ]
+}
