@@ -37,7 +37,7 @@ v2 与 science-gates 保持独立，不共享代码（D-020）。
 
 机器读写的文件（决策登记、配置、事实登记、状态文件等）用 JSON，脚本只依赖 Python 标准库；面向用户阅读与确认的文件（设计稿、spec、spec 地图）用 Markdown（D-021）。
 
-流程内产物的身份是 git commit。采用本流程即授权在流程专用工作分支或 worktree 上做本地检查点提交；push、merge、发布仍须逐次授权。LLM 不计算、不抄写 hash（D-015）。
+流程内产物的身份是 git commit。采用本流程即授权在流程专用工作分支或 worktree 上做本地检查点提交；push、merge、发布仍须逐次授权。LLM 不计算、不抄写 hash（D-015）。检查点提交只在 `eg/` 开头的分支上进行，只提交明确列出的路径，尊重仓库钩子与已配置的提交者身份，没有改动时不产生空提交；命令为 `eg.py checkpoint` 与 `eg.py identity`（D-026）。
 
 ## 4. 九个阶段
 

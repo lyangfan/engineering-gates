@@ -47,7 +47,9 @@
       "id": "D-007",
       "statement": "流程采用九阶段骨架：1 问答决策、2 设计稿、3 切分与定档、4 写 spec（含现实核验）、5 审 spec、6 测试先行、7 实现、8 审实现、9 复盘。独立审查只设在阶段 5 和阶段 8；阶段 2 和阶段 3 以机械检查加用户确认放行；其余阶段以各自的机械退出检查放行。各阶段细节由后续问题确定；测试的冻结时点与审查归属留给 Q-07，可调整阶段 5 与 6 的关系。",
       "status": "active",
-      "amended_by": ["D-009"],
+      "amended_by": [
+        "D-009"
+      ],
       "source": "dialogue.md#round-2",
       "date": "2026-10-14"
     },
@@ -62,7 +64,9 @@
       "id": "D-009",
       "statement": "三档差异：spec 形式——轻量为一页卡片（目标、引用决定编号的条款、附\"必须失败的错误实现\"的验收），标准为带稳定条款 ID 的完整 spec，严格另加影响登记与迁移说明；现实核验——轻量不要求，标准实测所用依赖行为，严格实测并钉版本、核验脚本存档；测试作者——三档均独立（D-003）；测试证明力——轻量要求测试在当前代码上先失败，标准另要求把 spec 中每个\"错误实现\"做成补丁后测试必须失败，严格再加崩溃/并发/超时故障注入；独立审查——轻量在实现后做一次合并审查（spec 卡片、测试、代码一起），不通过即升为标准档；标准与严格在阶段 5、8 各一次，严格的检查表另加跨 spec 影响项；用户确认点——轻量为定档与最终验收，标准为定档、spec 冻结与实现 PASS，严格另加影响登记确认。轮次预算由 Q-09 决定；错误实现补丁的作者与时点由 Q-07 决定。",
       "status": "active",
-      "amends": ["D-007"],
+      "amends": [
+        "D-007"
+      ],
       "source": "dialogue.md#round-3b",
       "date": "2026-10-14"
     },
@@ -91,7 +95,10 @@
       "id": "D-013",
       "statement": "独立测试作者编写的是针对 spec 所定义对外接口的验收测试；实现者可自由补充单元测试，但不作为验收证据。测试作者可见 spec、事实登记和实现开始前的代码库版本，不可见实现者会话与进行中的代码；实现者只读可见验收测试。标准档与严格档中，测试作者在实现完成后第二次介入，依据 spec 中的错误实现描述在候选代码上编写补丁；脚本逐个应用补丁并运行带对应标记的测试，每个补丁都必须使测试失败；审查者核对补丁是否忠实于错误实现描述。",
       "status": "active",
-      "refines": ["D-003", "D-009"],
+      "refines": [
+        "D-003",
+        "D-009"
+      ],
       "source": "dialogue.md#round-7",
       "date": "2026-10-14"
     },
@@ -155,7 +162,9 @@
       "id": "D-022",
       "statement": "追溯写法与入口：决定状态只取 active、superseded、withdrawn（\"某事后置\"本身是 active 决定）；条款写作 **[<SPEC>-Cnn]**，验收写作 **[<SPEC>-ACnn]**，错误实现写作 [<SPEC>-ACnn-Wn]，决定与事实引用直接写在正文中；测试标记为任意位置出现的 eg:ac <验收 ID>；统一入口为 python3 scripts/eg.py，追溯检查为 trace 子命令，带 --mode design|spec|tests 与 --freeze；退出码 0 通过、1 检查失败、2 用法或输入错误，JSON 报告写到标准输出；项目根目录配置文件 eg.json 声明决策登记、设计稿、spec 地图、spec 文件与测试文件的位置；spec 地图保持 Markdown 表格。",
       "status": "active",
-      "amended_by": ["D-023"],
+      "amended_by": [
+        "D-023"
+      ],
       "source": "dialogue.md#round-s2-p",
       "date": "2026-10-14"
     },
@@ -163,7 +172,9 @@
       "id": "D-023",
       "statement": "trace 子命令增加可重复的 --spec <ID> 参数：spec 与 tests 模式下，条款、验收、冻结与测试标记检查只作用于选中的 spec；未给出时作用于全部文件已存在的 spec。使多份 spec 可以处于不同阶段并行推进。",
       "status": "active",
-      "amends": ["D-022"],
+      "amends": [
+        "D-022"
+      ],
       "source": "dialogue.md#round-s2-b1",
       "date": "2026-10-14"
     },
@@ -179,6 +190,13 @@
       "statement": "trace 子命令保留 --root <目录> 参数，指定 eg.json 所在的项目根目录，缺省为当前目录。",
       "status": "active",
       "source": "dialogue.md#round-s2-c1",
+      "date": "2026-10-14"
+    },
+    {
+      "id": "D-026",
+      "statement": "EG-S1 身份与检查点的实质选择 K1—K7：K1 只在当前分支名以 eg/ 开头时提交，其他分支一律拒绝，不自动建 worktree；K2 只提交命令中明确列出的路径，先 add 这些路径再以 commit --only 只提交它们，绝不使用 git add -A；K3 尊重仓库钩子，钩子拦下提交时命令失败退出且不提交；K4 使用仓库已配置的 user.name 与 user.email，未配置即报错退出，不伪造身份；K5 提交命令为 eg.py checkpoint --kind <spec-freeze|tests-freeze|candidate|review|record> --path <路径>…，提交信息带 EG-Kind 与 EG-Spec 两行，输出含 commit 号与每个文件 sha256 的 JSON；K6 身份核验命令为 eg.py identity --path <路径> [--at <commit>]，给出文件在该 commit 中的 sha256 并检查工作区文件是否一致；K7 列出的路径没有改动时报错退出，不产生空提交。冻结记录的正式格式归 EG-S5。",
+      "status": "active",
+      "source": "dialogue.md#round-s1-k",
       "date": "2026-10-14"
     }
   ]
