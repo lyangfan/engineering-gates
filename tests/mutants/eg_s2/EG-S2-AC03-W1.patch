@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..cadf7f8 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -475,7 +475,7 @@ def load_registry(text, path):
+         if not id_ok:
+             continue
+         status = entry.get("status")
+-        if isinstance(status, str) and status not in STATUSES:
++        if isinstance(status, str) and status == "":
+             failures.append(
+                 problem(
+                     "EG-S2-C03",

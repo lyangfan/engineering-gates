@@ -1,0 +1,15 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..77fee50 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1633,8 +1633,8 @@ def run_trace(argv):
+     )
+     # A spec id counts as having a file only after filename assignment.
+     existing = {sid for sid, files in docs.items() if files}
+-    if not args["specs"]:
+-        selected = sorted(existing)
++    selected = sorted(existing)
++    report_unknown = True
+     allocations = evaluate_map(
+         project["map_model"],
+         project["by_id"],

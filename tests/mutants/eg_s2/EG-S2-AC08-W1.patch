@@ -1,0 +1,29 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..fa97294 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1111,24 +1111,6 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
+                                 line=row_line,
+                             )
+                         )
+-            if rule_ok and yes and rule != "严格":
+-                failures.append(
+-                    problem(
+-                        "EG-S2-C08",
+-                        "spec %s 的清单含有“是”，规则结果必须为严格" % sid,
+-                        path=map_path,
+-                        line=line,
+-                    )
+-                )
+-            if rule_ok and all_no and not yes and rule == "严格":
+-                failures.append(
+-                    problem(
+-                        "EG-S2-C08",
+-                        "spec %s 的清单全为“否”，规则结果不得为严格" % sid,
+-                        path=map_path,
+-                        line=line,
+-                    )
+-                )
+             if rule_ok and confirmed_ok and TIER_RANK[confirmed] < TIER_RANK[rule]:
+                 if reason.strip() == "":
+                     failures.append(

@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..5f6fb37 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -582,7 +582,7 @@ def check_relations(by_id, order, path, failures):
+                             line=decision.line,
+                         )
+                     )
+-                elif target not in by_id:
++                elif target not in by_id and field == "supersedes":
+                     failures.append(
+                         problem(
+                             "EG-S2-C04",

@@ -1,0 +1,15 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..24b4f9b 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1516,8 +1516,8 @@ def _freeze_markers(parsed, sid, failures, local_choices):
+             message = "残留 [AUTHOR-CHOICE:substantive]"
+         else:
+             message = "条款 %s 残留 [AUTHOR-CHOICE:substantive]" % block.full_id
+-        failures.append(
+-            problem("EG-S2-C13", message, path=parsed.path, line=line_no)
++        sys.stderr.buffer.write(
++            ("警告：%s:%d %s\n" % (parsed.path, line_no, message)).encode("utf-8")
+         )
+ 
+ 

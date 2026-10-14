@@ -1,0 +1,17 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..1fc569d 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1358,9 +1358,10 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+                     )
+                 )
+         cited = set()
+-        for path, block in real_clauses:
++        for parsed in files:
++            text = "\n".join(parsed.masked_lines)
+             for did in allocations.get(sid, ()):
+-                if _cites(block, did):
++                if re.search(r"(?<![A-Za-z0-9])" + re.escape(did) + r"(?![A-Za-z0-9])", text):
+                     cited.add(did)
+         for did in sorted(allocations.get(sid, ())):
+             if did not in active_ids or did in cited:

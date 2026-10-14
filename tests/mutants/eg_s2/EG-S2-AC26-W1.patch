@@ -1,0 +1,14 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..3eed521 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1161,6 +1161,9 @@ def parse_spec_file(text, path, owner):
+         if HEADING_RE.match(line):
+             current = None
+             continue
++        if line.strip() == "" and current is not None and current.kind == "clause":
++            current = None
++            continue
+         clause = CLAUSE_RE.match(line)
+         acceptance = ACCEPTANCE_RE.match(line)
+         match = clause or acceptance

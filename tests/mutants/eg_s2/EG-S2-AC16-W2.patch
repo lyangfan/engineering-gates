@@ -1,0 +1,91 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..140401d 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1346,7 +1346,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+         for path, block in real_acceptances:
+             declared = _coverage(block, sid, clause_id_set, path, failures)
+             covered.update(declared)
+-            _wrong_implementations(block, path, failures)
++        _wrong_implementations(real_acceptances, failures)
+         for path, block in real_clauses:
+             if block.full_id not in covered:
+                 failures.append(
+@@ -1436,49 +1436,41 @@ def _coverage(block, owner, clause_ids, path, failures):
+     return ok
+ 
+ 
+-def _wrong_implementations(block, path, failures):
+-    seen = {}
+-    valid = 0
+-    for line_no, text in block.lines:
+-        match = WI_LINE_RE.match(text)
+-        if not match:
+-            continue
+-        token = match.group(1)
+-        parsed = WI_ID_RE.match(token)
+-        if not parsed:
+-            continue
+-        prefix, number = parsed.group(1), parsed.group(2)
+-        if prefix != block.full_id:
+-            failures.append(
+-                problem(
+-                    "EG-S2-C16",
+-                    "错误实现 %s 的前缀与所在验收 %s 不一致" % (token, block.full_id),
+-                    path=path,
+-                    line=line_no,
++def _wrong_implementations(acceptances, failures):
++    owned = {}
++    for path, block in acceptances:
++        for line_no, text in block.lines:
++            match = WI_LINE_RE.match(text)
++            if not match:
++                continue
++            parsed = WI_ID_RE.match(match.group(1))
++            if not parsed:
++                continue
++            owned.setdefault(parsed.group(1), []).append((path, line_no, parsed.group(2)))
++    for path, block in acceptances:
++        seen = {}
++        items = owned.get(block.full_id, [])
++        for item_path, line_no, number in items:
++            if number in seen:
++                failures.append(
++                    problem(
++                        "EG-S2-C16",
++                        "验收 %s 中错误实现编号 W%s 重复" % (block.full_id, number),
++                        path=item_path,
++                        line=line_no,
++                    )
+                 )
+-            )
+-            continue
+-        valid += 1
+-        if number in seen:
++            else:
++                seen[number] = line_no
++        if not items:
+             failures.append(
+                 problem(
+                     "EG-S2-C16",
+-                    "验收 %s 中错误实现编号 W%s 重复" % (block.full_id, number),
++                    "验收 %s 没有错误实现" % block.full_id,
+                     path=path,
+-                    line=line_no,
++                    line=block.start_line,
+                 )
+             )
+-        else:
+-            seen[number] = line_no
+-    if valid == 0:
+-        failures.append(
+-            problem(
+-                "EG-S2-C16",
+-                "验收 %s 没有错误实现" % block.full_id,
+-                path=path,
+-                line=block.start_line,
+-            )
+-        )
+ 
+ 
+ def _line_has_token(text, token):

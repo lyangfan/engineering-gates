@@ -1,0 +1,21 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..e3b4e4f 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -609,16 +609,6 @@ def check_relations(by_id, order, path, failures):
+                     line=decision.line,
+                 )
+             )
+-        if decision.id in targets and decision.status != "superseded":
+-            failures.append(
+-                problem(
+-                    "EG-S2-C04",
+-                    "决定 %s 被 supersedes 引用，但其 status 不是 superseded"
+-                    % decision.id,
+-                    path=path,
+-                    line=decision.line,
+-                )
+-            )
+     for decision in order:
+         for target in decision.amends:
+             if target == decision.id or target not in by_id:

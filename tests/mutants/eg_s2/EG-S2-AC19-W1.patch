@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..51f7ae1 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1591,7 +1591,7 @@ def run_trace(argv):
+     try:
+         project = _load_project(root, mode)
+     except InputError as exc:
+-        return emit(mode, [], args["freeze"], exc.failures, [], 2)
++        return emit(mode, [], args["freeze"], exc.failures, [], 1)
+     if args["specs"]:
+         selection = _validate_selection(project, args["specs"])
+         if selection is not None:

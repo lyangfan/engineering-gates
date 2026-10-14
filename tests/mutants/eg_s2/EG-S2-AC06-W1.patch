@@ -1,0 +1,18 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..d8af238 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1249,11 +1249,8 @@ def check_design(design_texts, active_ids, by_id, decisions_path, failures):
+             for match in DESIGN_ID_RE.finditer(line):
+                 did = match.group(1)
+                 found.add(did)
+-                if did not in active_ids:
+-                    if did in by_id:
+-                        detail = "决定 %s 的 status 为 %s，不是 active" % (did, by_id[did].status)
+-                    else:
+-                        detail = "决定编号 %s 不存在" % did
++                if did not in by_id:
++                    detail = "决定编号 %s 不存在" % did
+                     failures.append(
+                         problem("EG-S2-C06", detail, path=rel, line=index + 1)
+                     )

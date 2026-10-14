@@ -1,0 +1,23 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..33b56ca 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -57,6 +57,7 @@ WI_ID_RE = re.compile(r"^(EG-S\d+-AC\d{2,})-W(\d+)$")
+ MARKER_RE = re.compile(
+     r"(?<![A-Za-z0-9_])eg:ac[ \t]+(EG-S\d+-AC\d{2,})(?![A-Za-z0-9])"
+ )
++TEST_NAME_RE = re.compile(r"^[ \t]*def[ \t]+test_\w*?(EG_S\d+_AC\d{2,})", re.M | re.I)
+ LOCAL_MARK = "[AUTHOR-CHOICE:local]"
+ SUBST_MARK = "[AUTHOR-CHOICE:substantive]"
+ YES_PREFIX = "是："
+@@ -1530,8 +1531,8 @@ def check_test_markers(test_texts, docs, selected, failures):
+     found = set()
+     selected_set = set(selected)
+     for rel, text in test_texts:
+-        for match in MARKER_RE.finditer(text):
+-            ac_id = match.group(1)
++        for match in TEST_NAME_RE.finditer(text):
++            ac_id = match.group(1).upper().replace("_", "-")
+             prefix = ac_id.split("-AC", 1)[0]
+             line = text.count("\n", 0, match.start()) + 1
+             if prefix not in selected_set:

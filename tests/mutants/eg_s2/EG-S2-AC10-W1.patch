@@ -1,0 +1,30 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..3ace7c8 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1279,6 +1279,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+                     path=rel,
+                 )
+             )
++    seen_numbers = {}
+     for sid in selected:
+         files = docs.get(sid, [])
+         if len(files) > 1:
+@@ -1327,6 +1328,17 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+                     )
+                 else:
+                     seen_clauses[block.full_id] = (parsed.path, block)
++                    number = block.full_id.rsplit("-", 1)[1]
++                    if number in seen_numbers:
++                        failures.append(
++                            problem(
++                                "EG-S2-C10",
++                                "条款 ID 重复：%s" % number,
++                                path=parsed.path,
++                                line=block.start_line,
++                            )
++                        )
++                    seen_numbers[number] = sid
+                 _classify_clause(block, parsed.path, active_ids, failures)
+             for block in parsed.acceptances():
+                 real_acceptances.append((parsed.path, block))

@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..2bd9d21 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -826,7 +826,7 @@ def parse_destination(cell):
+             return "not_in_spec", [], "不进 spec 的理由为空"
+         return "not_in_spec", [], None
+     if text.startswith(GLOBAL_RULE):
+-        return "global", [], None
++        return "global", re.findall(r"EG-S\d+", text[len(GLOBAL_RULE) :]), None
+     ids = []
+     rest = text
+     if rest == "":

@@ -1,0 +1,17 @@
+diff --git a/scripts/eg.py b/scripts/eg.py
+index bc1dd27..c357134 100644
+--- a/scripts/eg.py
++++ b/scripts/eg.py
+@@ -7,10 +7,10 @@ further subcommands on ``COMMANDS`` without changing this dispatch shape.
+ 
+ import sys
+ 
+-sys.dont_write_bytecode = True
+-
+ from egtrace.engine import run_trace, usage_error
+ 
++sys.dont_write_bytecode = True
++
+ 
+ COMMANDS = {
+     "trace": run_trace,

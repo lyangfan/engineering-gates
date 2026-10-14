@@ -1,0 +1,15 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..543ab4a 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -335,8 +335,9 @@ def expand_patterns(root, patterns):
+     seen = set()
+     root_norm = os.path.normpath(root)
+     for pattern in patterns:
+-        matches = glob.glob(os.path.join(root, pattern), recursive=True)
++        matches = glob.glob(pattern, root_dir=root, recursive=True)
+         for match in matches:
++            match = os.path.join(root, match)
+             if not os.path.isfile(match):
+                 continue
+             rel = os.path.relpath(os.path.normpath(match), root_norm)

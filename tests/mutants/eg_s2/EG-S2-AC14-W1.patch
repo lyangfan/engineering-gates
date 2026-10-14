@@ -1,0 +1,33 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..e0e1c63 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1279,6 +1279,9 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+                     path=rel,
+                 )
+             )
++    all_clause_ids = {
++        block.full_id for files in docs.values() for parsed in files for block in parsed.clauses()
++    }
+     for sid in selected:
+         files = docs.get(sid, [])
+         if len(files) > 1:
+@@ -1344,7 +1347,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+         clause_id_set = set(seen_clauses.keys())
+         covered = set()
+         for path, block in real_acceptances:
+-            declared = _coverage(block, sid, clause_id_set, path, failures)
++            declared = _coverage(block, sid, clause_id_set | all_clause_ids, path, failures)
+             covered.update(declared)
+             _wrong_implementations(block, path, failures)
+         for path, block in real_clauses:
+@@ -1421,8 +1424,7 @@ def _coverage(block, owner, clause_ids, path, failures):
+     declared = [part.strip() for part in match.group(1).split("、")]
+     ok = set()
+     for clause_id in declared:
+-        prefix = clause_id.split("-C", 1)[0]
+-        if prefix != owner or clause_id not in clause_ids:
++        if clause_id not in clause_ids:
+             failures.append(
+                 problem(
+                     "EG-S2-C14",

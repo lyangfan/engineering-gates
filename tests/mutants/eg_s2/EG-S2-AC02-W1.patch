@@ -1,0 +1,21 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..f464167 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -493,16 +493,6 @@ def load_registry(text, path):
+ def _entry_shape(entry, did, path, line, failures, keep):
+     label = did or "该决定"
+     relations = {}
+-    keys = set(entry.keys())
+-    for key in DECISION_REQUIRED:
+-        if key not in entry:
+-            failures.append(
+-                problem("EG-S2-C02", "决定 %s 缺少字段 %s" % (label, key), path=path, line=line)
+-            )
+-    for key in sorted(keys - set(DECISION_FIELDS)):
+-        failures.append(
+-            problem("EG-S2-C02", "决定 %s 含有未知字段 %s" % (label, key), path=path, line=line)
+-        )
+     for key in ("statement", "source"):
+         value = entry.get(key)
+         if key not in entry:

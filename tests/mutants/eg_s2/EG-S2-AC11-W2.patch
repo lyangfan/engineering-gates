@@ -1,0 +1,16 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..39fed39 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1383,9 +1383,10 @@ def _classify_clause(block, path, active_ids, failures):
+     facts = _refs(block, FACT_REF_RE)
+     local = _block_text_has(block, LOCAL_MARK)
+     substantive = _block_text_has(block, SUBST_MARK)
++    any_choice = _refs(block, re.compile(r"(\[AUTHOR-CHOICE:[^\]]*\])"))
+     active = [did for did in decisions if did in active_ids]
+     inactive = [did for did in decisions if did not in active_ids]
+-    if not active and not facts and not local and not substantive:
++    if not active and not facts and not any_choice:
+         failures.append(
+             problem(
+                 "EG-S2-C11",

@@ -1,0 +1,22 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..741d64d 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -461,16 +461,7 @@ def load_registry(text, path):
+                 )
+             )
+         if isinstance(did, str) and id_ok and did in by_id:
+-            failures.append(
+-                problem(
+-                    "EG-S2-C02",
+-                    "决定编号重复：%s" % did,
+-                    path=path,
+-                    line=line,
+-                )
+-            )
+-            _entry_shape(entry, did, path, line, failures, keep=False)
+-            continue
++            order.remove(by_id[did])
+         relations = _entry_shape(entry, did if id_ok else None, path, line, failures, keep=True)
+         if not id_ok:
+             continue

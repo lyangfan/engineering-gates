@@ -1,0 +1,21 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..f94d646 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -18,6 +18,7 @@ Ambiguities resolved against the spec text (see the final report for the list):
+ import glob
+ import json
+ import os
++import pathlib
+ import re
+ import sys
+ 
+@@ -335,7 +336,7 @@ def expand_patterns(root, patterns):
+     seen = set()
+     root_norm = os.path.normpath(root)
+     for pattern in patterns:
+-        matches = glob.glob(os.path.join(root, pattern), recursive=True)
++        matches = [str(path) for path in pathlib.Path(root).glob(pattern)]
+         for match in matches:
+             if not os.path.isfile(match):
+                 continue

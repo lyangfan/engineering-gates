@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..5872cb8 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1129,7 +1129,7 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
+                         line=line,
+                     )
+                 )
+-            if rule_ok and confirmed_ok and TIER_RANK[confirmed] < TIER_RANK[rule]:
++            if rule_ok and confirmed_ok and TIER_RANK[confirmed] != TIER_RANK[rule]:
+                 if reason.strip() == "":
+                     failures.append(
+                         problem(

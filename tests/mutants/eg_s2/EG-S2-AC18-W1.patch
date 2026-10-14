@@ -1,0 +1,45 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..55e39dc 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1611,11 +1611,11 @@ def run_trace(argv):
+         )
+         report_unknown = True
+     failures = []
+-    if mode in ("spec", "tests") and not project["spec_files"]:
++    if not project["spec_files"]:
+         failures.append(
+             problem("EG-S2-C24", "specs 的全部模式合计没有匹配到文件", path="eg.json")
+         )
+-    if mode == "tests" and not project["test_files"]:
++    if not project["test_files"]:
+         failures.append(
+             problem("EG-S2-C24", "tests 的全部模式合计没有匹配到文件", path="eg.json")
+         )
+@@ -1643,7 +1643,7 @@ def run_trace(argv):
+         failures,
+     )
+     local_choices = []
+-    if mode in ("spec", "tests"):
++    if mode in ("design", "spec", "tests"):
+         check_spec_bodies(
+             docs,
+             unknown,
+@@ -1655,7 +1655,7 @@ def run_trace(argv):
+             failures,
+             local_choices,
+         )
+-    if mode == "tests":
++    if mode in ("design", "spec", "tests"):
+         check_test_markers(project["test_texts"], docs, selected, failures)
+     report_specs = selected
+     if failures:
+@@ -1696,7 +1696,7 @@ def _load_project(root, mode):
+         spec_texts[rel_path] = text
+     test_files = []
+     test_texts = []
+-    if mode == "tests":
++    if mode in ("design", "spec", "tests"):
+         test_files = expand_patterns(root, config["tests"])
+         for rel in test_files:
+             text, rel_path = _read_listed(root, rel, "EG-S2-C19", "测试文件")

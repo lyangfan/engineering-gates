@@ -1,0 +1,31 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..410f244 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -25,6 +25,7 @@ import sys
+ REPORT_SCHEMA = "eg-trace-report/v1"
+ CONFIG_SCHEMA = "eg-config/v1"
+ DECISIONS_SCHEMA = "eg-decisions/v1"
++_REPORT_ROOT = None
+ 
+ CONFIG_KEYS = ("schema", "decisions", "design", "spec_map", "specs", "tests")
+ DECISION_REQUIRED = ("id", "statement", "status", "source", "date")
+@@ -133,6 +134,9 @@ def emit(mode, specs, freeze, failures, local_choices, code):
+         "local_choices": local_choices,
+     }
+     raw = json.dumps(report, ensure_ascii=False, indent=2).encode("utf-8") + b"\n"
++    if _REPORT_ROOT:
++        with open(os.path.join(_REPORT_ROOT, ".eg-trace-cache.json"), "wb") as handle:
++            handle.write(raw)
+     sys.stdout.buffer.write(raw)
+     sys.stdout.buffer.flush()
+     _write_summary(report)
+@@ -1588,6 +1592,8 @@ def run_trace(argv):
+         return usage_error(combo, mode=report_mode(args), freeze=args["freeze"])
+     mode = args["mode"]
+     root = os.path.abspath(args["root"] or os.getcwd())
++    global _REPORT_ROOT
++    _REPORT_ROOT = root
+     try:
+         project = _load_project(root, mode)
+     except InputError as exc:

@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..a3aac55 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -151,6 +151,8 @@ def _write_summary(report):
+             "local %s %s:%s"
+             % (choice["clause"], choice["path"], choice["line"])
+         )
++    sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
++    sys.stdout.buffer.flush()
+     sys.stderr.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
+     sys.stderr.buffer.flush()
+ 

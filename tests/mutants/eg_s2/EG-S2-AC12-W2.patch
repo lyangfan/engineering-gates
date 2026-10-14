@@ -1,0 +1,23 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..3f01088 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1376,6 +1376,18 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+         if freeze:
+             for parsed in files:
+                 _freeze_markers(parsed, sid, failures, local_choices)
++    if report_unknown:
++        for sid in sorted(allocations):
++            if docs.get(sid):
++                continue
++            for did in sorted(allocations[sid]):
++                if did in active_ids:
++                    failures.append(
++                        problem(
++                            "EG-S2-C12",
++                            "分配给 %s 的 active 决定 %s 没有被任何条款引用" % (sid, did),
++                        )
++                    )
+ 
+ 
+ def _classify_clause(block, path, active_ids, failures):

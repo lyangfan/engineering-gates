@@ -1,0 +1,20 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..edef6fc 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1086,13 +1086,13 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
+                             )
+                         else:
+                             yes = True
+-                            if sid in clause_ids:
++                            if sid in spec_set:
+                                 found = [
+                                     match.group(1)
+                                     for match in CLAUSE_ID_RE.finditer(note)
+                                     if match.group(1).startswith(sid + "-C")
+                                 ]
+-                                if not any(item in clause_ids[sid] for item in found):
++                                if not any(item in clause_ids.get(sid, ()) for item in found):
+                                     failures.append(
+                                         problem(
+                                             "EG-S2-C09",

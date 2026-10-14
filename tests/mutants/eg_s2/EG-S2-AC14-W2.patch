@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..9877310 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1346,6 +1346,8 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+         for path, block in real_acceptances:
+             declared = _coverage(block, sid, clause_id_set, path, failures)
+             covered.update(declared)
++            for _line, text in block.lines:
++                covered.update(match.group(1) for match in CLAUSE_ID_RE.finditer(text))
+             _wrong_implementations(block, path, failures)
+         for path, block in real_clauses:
+             if block.full_id not in covered:

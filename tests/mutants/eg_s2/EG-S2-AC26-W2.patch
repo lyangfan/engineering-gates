@@ -1,0 +1,18 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..d669d24 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1154,11 +1154,12 @@ def _assign_spec(filename, spec_ids):
+ def parse_spec_file(text, path, owner):
+     masked = mask_code(text)
+     masked_lines = masked.splitlines()
++    raw_lines = text.splitlines()
+     blocks = []
+     current = None
+     for index, line in enumerate(masked_lines):
+         line_no = index + 1
+-        if HEADING_RE.match(line):
++        if HEADING_RE.match(raw_lines[index]):
+             current = None
+             continue
+         clause = CLAUSE_RE.match(line)

@@ -1,0 +1,28 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..ed96237 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -27,6 +27,14 @@ CONFIG_SCHEMA = "eg-config/v1"
+ DECISIONS_SCHEMA = "eg-decisions/v1"
+ 
+ CONFIG_KEYS = ("schema", "decisions", "design", "spec_map", "specs", "tests")
++CONFIG_DEFAULTS = {
++    "schema": CONFIG_SCHEMA,
++    "decisions": "docs/design/decisions.json",
++    "design": ["docs/design/design-v2.md"],
++    "spec_map": "docs/design/spec-map.md",
++    "specs": ["docs/specs/*.md"],
++    "tests": ["tests/**/*.py"],
++}
+ DECISION_REQUIRED = ("id", "statement", "status", "source", "date")
+ DECISION_OPTIONAL = ("supersedes", "amends", "refines", "amended_by")
+ DECISION_FIELDS = DECISION_REQUIRED + DECISION_OPTIONAL
+@@ -273,7 +281,7 @@ def load_config(root):
+     keys = set(data.keys())
+     required = set(CONFIG_KEYS)
+     for key in sorted(required - keys):
+-        failures.append(_config_problem("eg.json 缺少字段 %s" % key))
++        data[key] = CONFIG_DEFAULTS[key]
+     for key in sorted(keys - required):
+         failures.append(_config_problem("eg.json 含有未知字段 %s" % key))
+     if failures:

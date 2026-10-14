@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..16560a3 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -307,7 +307,7 @@ def load_config(root):
+ def _read_text(path):
+     with open(path, "rb") as handle:
+         data = handle.read()
+-    return data.decode("utf-8-sig")
++    return data.decode("utf-8")
+ 
+ 
+ def _read_listed(root, rel, check, label):

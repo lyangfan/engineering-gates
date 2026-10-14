@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..73b078b 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -111,7 +111,7 @@ def problem(check, message, path=None, line=None):
+         line = None
+     if isinstance(path, str):
+         path = path.replace("\\", "/")
+-    return {"check": check, "path": path, "line": line, "message": message}
++    return {"check": check, "path": path, "message": message}
+ 
+ 
+ def emit(mode, specs, freeze, failures, local_choices, code):

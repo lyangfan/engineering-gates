@@ -1,0 +1,12 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..ca6a4c6 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -646,7 +646,6 @@ def check_relations(by_id, order, path, failures):
+                         line=decision.line,
+                     )
+                 )
+-    _supersedes_cycles(graph, by_id, path, failures)
+ 
+ 
+ def _supersedes_cycles(graph, by_id, path, failures):

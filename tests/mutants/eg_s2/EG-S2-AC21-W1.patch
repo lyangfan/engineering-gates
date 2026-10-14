@@ -1,0 +1,24 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..ee7dbc4 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -21,6 +21,8 @@ import os
+ import re
+ import sys
+ 
++import yaml
++
+ 
+ REPORT_SCHEMA = "eg-trace-report/v1"
+ CONFIG_SCHEMA = "eg-config/v1"
+@@ -264,8 +266,8 @@ def load_config(root):
+             [problem("EG-S2-C24", "eg.json 无法按 UTF-8 解码", path="eg.json")]
+         )
+     try:
+-        data = json.loads(text)
+-    except ValueError:
++        data = yaml.safe_load(text)
++    except (ValueError, yaml.YAMLError):
+         raise InputError([_config_problem("eg.json 不是合法 JSON")])
+     if not isinstance(data, dict):
+         raise InputError([_config_problem("eg.json 必须为 JSON 对象")])

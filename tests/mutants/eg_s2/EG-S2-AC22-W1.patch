@@ -1,0 +1,22 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..55556fe 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1152,7 +1152,7 @@ def _assign_spec(filename, spec_ids):
+ 
+ 
+ def parse_spec_file(text, path, owner):
+-    masked = mask_code(text)
++    masked = text
+     masked_lines = masked.splitlines()
+     blocks = []
+     current = None
+@@ -1244,7 +1244,7 @@ def _cites(block, did):
+ def check_design(design_texts, active_ids, by_id, decisions_path, failures):
+     found = set()
+     for rel, text in design_texts:
+-        masked = mask_code(text)
++        masked = text
+         for index, line in enumerate(masked.splitlines()):
+             for match in DESIGN_ID_RE.finditer(line):
+                 did = match.group(1)

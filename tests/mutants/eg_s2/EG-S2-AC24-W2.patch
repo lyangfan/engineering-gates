@@ -1,0 +1,19 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..d3f377c 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1611,14 +1611,6 @@ def run_trace(argv):
+         )
+         report_unknown = True
+     failures = []
+-    if mode in ("spec", "tests") and not project["spec_files"]:
+-        failures.append(
+-            problem("EG-S2-C24", "specs 的全部模式合计没有匹配到文件", path="eg.json")
+-        )
+-    if mode == "tests" and not project["test_files"]:
+-        failures.append(
+-            problem("EG-S2-C24", "tests 的全部模式合计没有匹配到文件", path="eg.json")
+-        )
+     failures.extend(project["entry_failures"])
+     check_relations(project["by_id"], project["order"], project["decisions_path"], failures)
+     check_design(

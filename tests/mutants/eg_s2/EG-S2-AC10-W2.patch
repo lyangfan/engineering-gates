@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..7020032 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1296,7 +1296,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+         real_acceptances = []
+         for parsed in files:
+             for block in parsed.blocks:
+-                if block.kind == "clause" and not block.prefix_ok:
++                if block.kind == "clause" and block.spec_prefix not in docs:
+                     failures.append(
+                         problem(
+                             "EG-S2-C10",

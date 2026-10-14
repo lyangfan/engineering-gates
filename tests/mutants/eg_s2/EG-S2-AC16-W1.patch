@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..9789f99 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1442,6 +1442,8 @@ def _wrong_implementations(block, path, failures):
+     for line_no, text in block.lines:
+         match = WI_LINE_RE.match(text)
+         if not match:
++            if re.match(r"^[ \t]*-[ \t]+\S", text):
++                valid += 1
+             continue
+         token = match.group(1)
+         parsed = WI_ID_RE.match(token)

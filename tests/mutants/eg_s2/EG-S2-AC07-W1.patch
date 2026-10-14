@@ -1,0 +1,15 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..5a7f49f 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -993,8 +993,9 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
+                     )
+                 )
+                 continue
+-            counts[did] = counts.get(did, 0) + 1
+             _kind, ids, error = parse_destination(dest)
++            if _kind == "specs":
++                counts[did] = counts.get(did, 0) + 1
+             if error:
+                 failures.append(
+                     problem("EG-S2-C07", "决定 %s 的去向：%s" % (did, error), path=map_path, line=line)

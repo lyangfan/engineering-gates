@@ -1,0 +1,18 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..c03c04b 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -877,9 +877,10 @@ def parse_map(text):
+             model["structural"].append(
+                 problem("EG-S2-C25", "spec 地图缺少章节：%s" % title, path=None)
+             )
+-    alloc = sections.get("决定分配")
+-    checklist = sections.get("定档清单")
+-    tier = sections.get("档位")
++    ordered = list(sections.values())
++    alloc = ordered[2] if "决定分配" in sections and len(ordered) > 2 else None
++    checklist = ordered[3] if "定档清单" in sections and len(ordered) > 3 else None
++    tier = ordered[4] if "档位" in sections and len(ordered) > 4 else None
+     alloc_table = extract_table(alloc["body"]) if alloc else None
+     check_table = extract_table(checklist["body"]) if checklist else None
+     tier_table = extract_table(tier["body"]) if tier else None

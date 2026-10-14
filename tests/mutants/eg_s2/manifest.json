@@ -1,0 +1,360 @@
+[
+  {
+    "w": "EG-S2-AC01-W1",
+    "patch": "EG-S2-AC01-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.ConfigTests.test_ac01_config_errors_exit_2_and_name_the_field"
+    ]
+  },
+  {
+    "w": "EG-S2-AC01-W2",
+    "patch": "EG-S2-AC01-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.ConfigTests.test_ac01_trailing_globstar_collects_files"
+    ]
+  },
+  {
+    "w": "EG-S2-AC02-W1",
+    "patch": "EG-S2-AC02-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac02_entry_problems_fail_with_exit_1"
+    ]
+  },
+  {
+    "w": "EG-S2-AC02-W2",
+    "patch": "EG-S2-AC02-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac02_entry_problems_fail_with_exit_1"
+    ]
+  },
+  {
+    "w": "EG-S2-AC02-W3",
+    "patch": "EG-S2-AC02-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac02_four_digit_id_is_valid"
+    ]
+  },
+  {
+    "w": "EG-S2-AC03-W1",
+    "patch": "EG-S2-AC03-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac03_unknown_status_values_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC04-W1",
+    "patch": "EG-S2-AC04-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac04_supersedes_cycle_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC04-W2",
+    "patch": "EG-S2-AC04-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac04_relation_violations_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC04-W3",
+    "patch": "EG-S2-AC04-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.RegistryTests.test_ac04_relation_violations_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC05-W1",
+    "patch": "EG-S2-AC05-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.DesignTests.test_ac05_all_design_files_are_scanned"
+    ]
+  },
+  {
+    "w": "EG-S2-AC06-W1",
+    "patch": "EG-S2-AC06-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.DesignTests.test_ac06_bad_references_in_design_fail",
+      "tests.acceptance.eg_s2.test_trace.DesignTests.test_ac06_both_unknown_and_superseded_reported"
+    ]
+  },
+  {
+    "w": "EG-S2-AC07-W1",
+    "patch": "EG-S2-AC07-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac07_global_and_not_in_spec_rows_are_allocations"
+    ]
+  },
+  {
+    "w": "EG-S2-AC07-W2",
+    "patch": "EG-S2-AC07-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac07_global_and_not_in_spec_rows_are_allocations"
+    ]
+  },
+  {
+    "w": "EG-S2-AC08-W1",
+    "patch": "EG-S2-AC08-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac08_tier_errors_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC08-W2",
+    "patch": "EG-S2-AC08-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac08_upgrade_without_reason_passes"
+    ]
+  },
+  {
+    "w": "EG-S2-AC09-W1",
+    "patch": "EG-S2-AC09-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac09_missing_spec_only_needs_non_empty_note"
+    ]
+  },
+  {
+    "w": "EG-S2-AC09-W2",
+    "patch": "EG-S2-AC09-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac09_checklist_cell_errors_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC10-W1",
+    "patch": "EG-S2-AC10-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClauseNamingTests.test_ac10_clause_ids_unique_per_spec_only",
+      "tests.acceptance.eg_s2.test_trace_specs.ClauseNamingTests.test_ac10_prefix_must_be_followed_by_dash_or_dot"
+    ]
+  },
+  {
+    "w": "EG-S2-AC10-W2",
+    "patch": "EG-S2-AC10-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClauseNamingTests.test_ac10_clause_prefix_must_equal_file_spec"
+    ]
+  },
+  {
+    "w": "EG-S2-AC11-W1",
+    "patch": "EG-S2-AC11-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac11_unclassified_clause_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC11-W2",
+    "patch": "EG-S2-AC11-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac11_unclassified_clause_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC12-W1",
+    "patch": "EG-S2-AC12-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac12_allocated_decision_must_be_cited_in_a_clause"
+    ]
+  },
+  {
+    "w": "EG-S2-AC12-W2",
+    "patch": "EG-S2-AC12-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac12_allocation_to_spec_without_file_is_not_checked",
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac12_only_superseded_reference_reports_c11_and_c12"
+    ]
+  },
+  {
+    "w": "EG-S2-AC13-W1",
+    "patch": "EG-S2-AC13-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac13_freeze_rejects_substantive_marker"
+    ]
+  },
+  {
+    "w": "EG-S2-AC14-W1",
+    "patch": "EG-S2-AC14-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac14_coverage_of_other_spec_clause_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC14-W2",
+    "patch": "EG-S2-AC14-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac14_mention_outside_declaration_is_not_coverage"
+    ]
+  },
+  {
+    "w": "EG-S2-AC15-W1",
+    "patch": "EG-S2-AC15-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac14_mention_outside_declaration_is_not_coverage",
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac15_uncovered_clause_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC16-W1",
+    "patch": "EG-S2-AC16-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac16_wrong_implementation_errors_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC16-W2",
+    "patch": "EG-S2-AC16-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.AcceptanceTests.test_ac16_wrong_implementation_errors_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC17-W1",
+    "patch": "EG-S2-AC17-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_missing_marker_reported_only_in_tests_mode",
+      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_unknown_acceptance_id_in_tests_fails"
+    ]
+  },
+  {
+    "w": "EG-S2-AC17-W2",
+    "patch": "EG-S2-AC17-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_marker_in_string_is_recognised"
+    ]
+  },
+  {
+    "w": "EG-S2-AC18-W1",
+    "patch": "EG-S2-AC18-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ModeTests.test_ac18_spec_errors_ignored_in_design_mode",
+      "tests.acceptance.eg_s2.test_trace_cli.ModeTests.test_ac18_spec_file_naming_errors_ignored_in_design_mode",
+      "tests.acceptance.eg_s2.test_trace_cli.ModeTests.test_ac18_test_marker_errors_only_in_tests_mode"
+    ]
+  },
+  {
+    "w": "EG-S2-AC18-W2",
+    "patch": "EG-S2-AC18-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ModeTests.test_ac18_usage_errors_exit_2"
+    ]
+  },
+  {
+    "w": "EG-S2-AC19-W1",
+    "patch": "EG-S2-AC19-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_input_errors_exit_2",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_registry_syntax_error_is_input_error"
+    ]
+  },
+  {
+    "w": "EG-S2-AC19-W2",
+    "patch": "EG-S2-AC19-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_failure_report_is_json_with_full_failure_items",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_input_errors_exit_2",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_pass_report",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_registry_syntax_error_is_input_error",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_single_entry_problem_is_check_failure"
+    ]
+  },
+  {
+    "w": "EG-S2-AC19-W3",
+    "patch": "EG-S2-AC19-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_failure_report_is_json_with_full_failure_items",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_input_errors_exit_2",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_registry_syntax_error_is_input_error",
+      "tests.acceptance.eg_s2.test_trace_cli.ReportTests.test_ac19_single_entry_problem_is_check_failure"
+    ]
+  },
+  {
+    "w": "EG-S2-AC20-W1",
+    "patch": "EG-S2-AC20-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ReadOnlyTests.test_ac20_runs_leave_project_unchanged"
+    ]
+  },
+  {
+    "w": "EG-S2-AC20-W2",
+    "patch": "EG-S2-AC20-W2.patch",
+    "killing_tests": []
+  },
+  {
+    "w": "EG-S2-AC21-W1",
+    "patch": "EG-S2-AC21-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.StdlibOnlyTests.test_ac21_runs_in_clean_python39_venv"
+    ]
+  },
+  {
+    "w": "EG-S2-AC21-W2",
+    "patch": "EG-S2-AC21-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.StdlibOnlyTests.test_ac21_runs_in_clean_python39_venv"
+    ]
+  },
+  {
+    "w": "EG-S2-AC22-W1",
+    "patch": "EG-S2-AC22-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac11_markers_inside_backticks_do_not_classify",
+      "tests.acceptance.eg_s2.test_trace_specs.ClassificationTests.test_ac13_markers_in_backticks_ignored_by_freeze",
+      "tests.acceptance.eg_s2.test_trace_specs.CodeExclusionTests.test_ac22_backticked_decision_in_design_not_counted",
+      "tests.acceptance.eg_s2.test_trace_specs.CodeExclusionTests.test_ac22_fenced_decisions_in_design_ignored",
+      "tests.acceptance.eg_s2.test_trace_specs.CodeExclusionTests.test_ac22_markers_in_spec_code_are_not_clauses"
+    ]
+  },
+  {
+    "w": "EG-S2-AC22-W2",
+    "patch": "EG-S2-AC22-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.CodeExclusionTests.test_ac22_backticked_marker_in_test_file_counts"
+    ]
+  },
+  {
+    "w": "EG-S2-AC23-W1",
+    "patch": "EG-S2-AC23-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.SpecSelectionTests.test_ac23_selected_spec_ignores_other_specs_freeze",
+      "tests.acceptance.eg_s2.test_trace_cli.SpecSelectionTests.test_ac23_selection_limits_clause_checks",
+      "tests.acceptance.eg_s2.test_trace_cli.SpecSelectionTests.test_ac23_selection_scope_of_file_naming_check",
+      "tests.acceptance.eg_s2.test_trace_cli.SpecSelectionTests.test_ac23_selection_scope_of_test_markers"
+    ]
+  },
+  {
+    "w": "EG-S2-AC24-W1",
+    "patch": "EG-S2-AC24-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.EncodingAndMatchTests.test_ac24_bom_is_accepted_in_every_input_file",
+      "tests.acceptance.eg_s2.test_trace.EncodingAndMatchTests.test_ac24_bom_registry_is_valid_json"
+    ]
+  },
+  {
+    "w": "EG-S2-AC24-W2",
+    "patch": "EG-S2-AC24-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.EncodingAndMatchTests.test_ac24_zero_matches_fail"
+    ]
+  },
+  {
+    "w": "EG-S2-AC25-W1",
+    "patch": "EG-S2-AC25-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac25_sections_located_by_heading_text"
+    ]
+  },
+  {
+    "w": "EG-S2-AC26-W1",
+    "patch": "EG-S2-AC26-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.BlockBoundaryTests.test_ac26_hash_lines_in_fence_are_not_headings",
+      "tests.acceptance.eg_s2.test_trace_specs.BlockBoundaryTests.test_ac26_reference_in_following_list_counts"
+    ]
+  },
+  {
+    "w": "EG-S2-AC26-W2",
+    "patch": "EG-S2-AC26-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_specs.BlockBoundaryTests.test_ac26_hash_lines_in_fence_are_not_headings"
+    ]
+  }
+]

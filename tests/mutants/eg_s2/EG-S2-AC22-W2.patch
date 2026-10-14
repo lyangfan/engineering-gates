@@ -1,0 +1,13 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..d0f026c 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -1530,7 +1530,7 @@ def check_test_markers(test_texts, docs, selected, failures):
+     found = set()
+     selected_set = set(selected)
+     for rel, text in test_texts:
+-        for match in MARKER_RE.finditer(text):
++        for match in MARKER_RE.finditer(mask_code(text)):
+             ac_id = match.group(1)
+             prefix = ac_id.split("-AC", 1)[0]
+             line = text.count("\n", 0, match.start()) + 1

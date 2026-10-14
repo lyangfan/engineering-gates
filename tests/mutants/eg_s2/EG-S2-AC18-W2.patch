@@ -1,0 +1,15 @@
+diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
+index 19b939a..657d993 100644
+--- a/scripts/egtrace/engine.py
++++ b/scripts/egtrace/engine.py
+@@ -218,10 +218,6 @@ def combination_error(args):
+         if mode is None:
+             return "缺少 --mode"
+         return "--mode 的值 %s 无法识别" % mode
+-    if args["freeze"] and mode != "spec":
+-        return "--freeze 只能与 --mode spec 同用"
+-    if args["specs"] and mode == "design":
+-        return "--spec 不能与 --mode design 同用"
+     return None
+ 
+ 
