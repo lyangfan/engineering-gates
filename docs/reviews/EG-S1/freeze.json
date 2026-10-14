@@ -1,0 +1,29 @@
+{
+  "schema": "eg-freeze-record/draft",
+  "spec_id": "EG-S1",
+  "tier": "严格",
+  "verdict_chain": [
+    "B1:FAIL",
+    "C1:FAIL",
+    "C2:PASS"
+  ],
+  "frozen_on": "2026-10-14",
+  "identity_kind": "git commit（D-015）",
+  "commit": "3955513aa8f2fed151aada9fac2ef6c3d0b4c57e",
+  "spec": {
+    "path": "docs/specs/EG-S1-checkpoint.md",
+    "sha256": "55c44f27fe9f83f0c3d474f7cc42f37d5aaf4dfdf16829515e67d4f3bf2e9682"
+  },
+  "reviews": {
+    "B1": "be59a0d",
+    "C1": "ffccdf5",
+    "C2": "3955513"
+  },
+  "local_choices": [
+    "EG-S1-C01",
+    "EG-S1-C04"
+  ],
+  "accepted_minor": [
+    "C2-01"
+  ]
+}

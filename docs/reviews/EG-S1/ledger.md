@@ -10,14 +10,18 @@
 
 | C1 | review-C1.md | 64c963a5320928f5d1db65ca34724778660df33a80aee63cb652822c778d7be4 | ffccdf5 | FAIL（2 MAJOR、4 MINOR；B1 关闭 11/12） |
 
-剩余预算：C2（最后一轮；仍不通过即 NON_CONVERGENT，由用户选择重置方式，D-016）。
+| C2 | review-C2.md | 51084a983922b9deec60ad817bacd9d1d61355c63c678691b2166ef6f9612f72 | 3955513 | PASS（1 MINOR） |
+
+预算 B1 + C1 + C2 已用完。
+
+**状态：FROZEN（2026-10-14）**，冻结字节为 commit `3955513` 中的 `docs/specs/EG-S1-checkpoint.md`（sha256 `55c44f27fe9f83f0c3d474f7cc42f37d5aaf4dfdf16829515e67d4f3bf2e9682`），冻结记录见 `freeze.json`。冻结后的变更按 D-017 处理。
 
 ## Findings
 
 | ID | 严重度 | 检查项 | 摘要 | 处置 | 状态 |
 |---|---|---|---|---|---|
 | B1-01 | BLOCKER | R2 | C15"不重试"是并发选择，却引用只讲钩子的 K3 | D-028 Y1 → C15 有界重试 | VERIFIED_CLOSED（C1） |
-| B1-02 | MAJOR | R8 | 恢复命令 `git reset` 同样需要锁，并发下恢复可能失败；AC15 不可保证 | D-028 Y2 → C11 恢复与恢复失败输出；C12 提交号校验；AC15 改为不变量 | FIX_PROPOSED（随 C1-01） |
+| B1-02 | MAJOR | R8 | 恢复命令 `git reset` 同样需要锁，并发下恢复可能失败；AC15 不可保证 | D-028 Y2 → C11 恢复与恢复失败输出；C12 提交号校验；AC15 改为不变量 | VERIFIED_CLOSED（C2） |
 | B1-03 | MAJOR | R8 | 超时终止方式未定；SIGKILL 会残留锁，钩子子进程存活 | D-028 Y3 → C14 进程组 SIGTERM→SIGKILL、环境变量缩短超时；F-19 探针 | VERIFIED_CLOSED（C1） |
 | B1-04 | MAJOR | R4/R6 | 非成功输出未定义：路径错误退出码、refused/error 分界、失败 JSON、identity 对已删除文件 | D-028 Y6 → C02 退出码与检查顺序、C03、C13、新 C17 | VERIFIED_CLOSED（C1） |
 | B1-05 | MAJOR | R4/R2/R3 | F-15 为假：未配置身份时 git 会自动推断身份提交；GIT_AUTHOR_* 环境变量会覆盖身份 | F-15 v2 带对照；C05 自行检查配置 + D-028 Y5 拒绝身份环境变量；AC05-W2/W3；F-18 探针 | VERIFIED_CLOSED（C1） |
@@ -29,12 +33,21 @@
 | B1-11 | MINOR | R4 | `--message` 换行可注入 trailer；`--spec` 未校验；路径规范化与重复未定 | C10 校验 --message 单行与 --spec 字符集；C03 规范路径与重复 | VERIFIED_CLOSED（C1） |
 | B1-12 | MINOR | R7 | 影响登记漏 EG-S3 | 影响登记加 EG-S3 | VERIFIED_CLOSED（C1） |
 
-| C1-01 | MAJOR | R8/R2 | C12 要求新提交的父提交等于记录的 HEAD，并发时正确的提交被判失败（20/20）；且 Y2 不含此规则 | D-030 Z1 → C10 EG-Run trailer、C12 按运行标识找提交；AC12、AC15 更新；F-21 | FIX_PROPOSED |
-| C1-02 | MAJOR | R3/R8 | AC15 时间上限过紧，用满 2 秒重试预算的正确实现失败（3/3）；C11 恢复是否另计预算有歧义 | AC15 上限改为 6 秒并说明预算；C11、C15 写明恢复另有一份预算 | FIX_PROPOSED |
-| C1-03 | MINOR | R3 | F-15 探针只断言 config 为空，"会自动推断身份提交"只打印未断言 | F-15a 改为断言 | FIX_PROPOSED |
-| C1-04 | MINOR | R4 | `author.*`、`committer.*` 配置仍会覆盖 `user.*` | D-030 Z2 → C05 拒绝 author.*/committer.* 配置；AC05-W4；F-20 | FIX_PROPOSED |
-| C1-05 | MINOR | R4 | identity 违反路径规则时的 result 与退出码未定 | C13 规定路径违规时为 error、退出码 1；AC13 | FIX_PROPOSED |
-| C1-06 | MINOR | R1 | `EG_GIT_TIMEOUT_SECONDS` 可调高到 300 秒以上，Y3 只允许测试缩短 | C14 限定 1—300；AC14 | FIX_PROPOSED |
+| C1-01 | MAJOR | R8/R2 | C12 要求新提交的父提交等于记录的 HEAD，并发时正确的提交被判失败（20/20）；且 Y2 不含此规则 | D-030 Z1 → C10 EG-Run trailer、C12 按运行标识找提交；AC12、AC15 更新；F-21 | VERIFIED_CLOSED（C2） |
+| C1-02 | MAJOR | R3/R8 | AC15 时间上限过紧，用满 2 秒重试预算的正确实现失败（3/3）；C11 恢复是否另计预算有歧义 | AC15 上限改为 6 秒并说明预算；C11、C15 写明恢复另有一份预算 | VERIFIED_CLOSED（C2） |
+| C1-03 | MINOR | R3 | F-15 探针只断言 config 为空，"会自动推断身份提交"只打印未断言 | F-15a 改为断言 | VERIFIED_CLOSED（C2） |
+| C1-04 | MINOR | R4 | `author.*`、`committer.*` 配置仍会覆盖 `user.*` | D-030 Z2 → C05 拒绝 author.*/committer.* 配置；AC05-W4；F-20 | VERIFIED_CLOSED（C2） |
+| C1-05 | MINOR | R4 | identity 违反路径规则时的 result 与退出码未定 | C13 规定路径违规时为 error、退出码 1；AC13 | VERIFIED_CLOSED（C2） |
+| C1-06 | MINOR | R1 | `EG_GIT_TIMEOUT_SECONDS` 可调高到 300 秒以上，Y3 只允许测试缩短 | C14 限定 1—300；AC14 | VERIFIED_CLOSED（C2） |
+
+| C2-01 | MINOR | R4 | C11"若 add 已执行"在 add 本身失败时有两种读法，只影响 message 文字 | 接受为已知限制，编辑性修订时改为"add 已返回成功"（D-017 编辑性） | ACCEPTED_LIMITATION |
+
+## 冻结后待办（编辑性，不改 EG-S1 冻结字节）
+
+- C11：改为"若 C08 的 `add` 已返回成功"（C2-01）。
+- C12：引用列表去掉不再需要的 D-028 Y2（C2 备注）。
+- AC12-W3：写明用 PATH 上的 git 包装脚本在提交前插入一个提交来注入（C2 备注）。
+- identity 的路径违规记为 `error` 而 D-028 Y6 用词为 `refused`：审查者判为不冲突（Y6 的用词针对 checkpoint 结果）；如用户认为 Y6 也约束 identity，再行处理。
 
 ## 复盘候选
 
