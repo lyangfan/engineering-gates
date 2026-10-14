@@ -1,23 +1,30 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..33b56ca 100644
+index 09caba9..a8afcc7 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -57,6 +57,7 @@ WI_ID_RE = re.compile(r"^(EG-S\d+-AC\d{2,})-W(\d+)$")
+@@ -58,6 +58,7 @@ WI_ID_RE = re.compile(r"^(.+-AC\d{2,})-W(\d+)$")
  MARKER_RE = re.compile(
-     r"(?<![A-Za-z0-9_])eg:ac[ \t]+(EG-S\d+-AC\d{2,})(?![A-Za-z0-9])"
+     r"(?<![A-Za-z0-9_])eg:ac[ \t]+([^\s]+?-AC\d{2,})(?![A-Za-z0-9])"
  )
-+TEST_NAME_RE = re.compile(r"^[ \t]*def[ \t]+test_\w*?(EG_S\d+_AC\d{2,})", re.M | re.I)
++TEST_NAME_RE = re.compile(r"^[ \t]*def[ \t]+(test_\w*)", re.M)
+ CLAUSE_SUFFIX_RE = re.compile(r"^(.+)-C\d{2,}$")
+ ACCEPTANCE_SUFFIX_RE = re.compile(r"^(.+)-AC\d{2,}$")
  LOCAL_MARK = "[AUTHOR-CHOICE:local]"
- SUBST_MARK = "[AUTHOR-CHOICE:substantive]"
- YES_PREFIX = "是："
-@@ -1530,8 +1531,8 @@ def check_test_markers(test_texts, docs, selected, failures):
+@@ -1587,9 +1588,15 @@ def check_test_markers(test_texts, docs, selected, failures, restrict_prefix):
+                 all_acceptances[block.full_id] = (parsed.path, block.start_line, sid)
      found = set()
      selected_set = set(selected)
++    name_keys = {re.sub(r"[^0-9a-z]+", "_", ac.lower()): ac for ac in all_acceptances}
      for rel, text in test_texts:
 -        for match in MARKER_RE.finditer(text):
 -            ac_id = match.group(1)
-+        for match in TEST_NAME_RE.finditer(text):
-+            ac_id = match.group(1).upper().replace("_", "-")
-             prefix = ac_id.split("-AC", 1)[0]
++        hits = [
++            (match, ac)
++            for match in TEST_NAME_RE.finditer(text)
++            for key, ac in name_keys.items()
++            if key in match.group(1).lower()
++        ]
++        for match, ac_id in hits:
+             prefix = _marked_spec(ac_id, ACCEPTANCE_SUFFIX_RE)
              line = text.count("\n", 0, match.start()) + 1
-             if prefix not in selected_set:
+             if restrict_prefix and prefix not in selected_set:

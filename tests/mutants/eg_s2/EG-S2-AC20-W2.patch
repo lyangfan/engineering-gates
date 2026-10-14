@@ -1,14 +1,16 @@
 diff --git a/scripts/eg.py b/scripts/eg.py
-index bc1dd27..c357134 100644
+index 7758009..14f98f7 100644
 --- a/scripts/eg.py
 +++ b/scripts/eg.py
-@@ -7,10 +7,10 @@ further subcommands on ``COMMANDS`` without changing this dispatch shape.
+@@ -7,12 +7,12 @@ and ``identity`` are EG-S1. Adding a subcommand must not change ``trace``.
  
  import sys
  
 -sys.dont_write_bytecode = True
 -
  from egtrace.engine import run_trace, usage_error
+ from egcheckpoint.checkpoint import run_checkpoint
+ from egcheckpoint.identity import run_identity
  
 +sys.dont_write_bytecode = True
 +

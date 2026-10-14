@@ -1,20 +1,26 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..edef6fc 100644
+index 09caba9..243162a 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -1086,13 +1086,13 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
-                             )
-                         else:
-                             yes = True
--                            if sid in clause_ids:
-+                            if sid in spec_set:
+@@ -1137,7 +1137,7 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
+             yes = False
+             all_no = column is not None and bool(model["check_rows"])
+             clause_note_re = None
+-            if sid in clause_ids:
++            if sid in spec_set:
+                 clause_note_re = re.compile(
+                     r"(?<![A-Za-z0-9])" + re.escape(sid) + r"-C\d{2,}(?![A-Za-z0-9])"
+                 )
+@@ -1166,7 +1166,11 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
                                  found = [
-                                     match.group(1)
-                                     for match in CLAUSE_ID_RE.finditer(note)
-                                     if match.group(1).startswith(sid + "-C")
+                                     match.group(0) for match in clause_note_re.finditer(note)
                                  ]
 -                                if not any(item in clause_ids[sid] for item in found):
-+                                if not any(item in clause_ids.get(sid, ()) for item in found):
++                                if sid in clause_ids:
++                                    ok = any(item in clause_ids[sid] for item in found)
++                                else:
++                                    ok = bool(found)
++                                if not ok:
                                      failures.append(
                                          problem(
                                              "EG-S2-C09",

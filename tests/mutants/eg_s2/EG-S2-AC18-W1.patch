@@ -1,8 +1,8 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..55e39dc 100644
+index 09caba9..3413612 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -1611,11 +1611,11 @@ def run_trace(argv):
+@@ -1669,11 +1669,11 @@ def run_trace(argv):
          )
          report_unknown = True
      failures = []
@@ -16,7 +16,7 @@ index 19b939a..55e39dc 100644
          failures.append(
              problem("EG-S2-C24", "tests 的全部模式合计没有匹配到文件", path="eg.json")
          )
-@@ -1643,7 +1643,7 @@ def run_trace(argv):
+@@ -1702,7 +1702,7 @@ def run_trace(argv):
          failures,
      )
      local_choices = []
@@ -25,16 +25,16 @@ index 19b939a..55e39dc 100644
          check_spec_bodies(
              docs,
              unknown,
-@@ -1655,7 +1655,7 @@ def run_trace(argv):
+@@ -1714,7 +1714,7 @@ def run_trace(argv):
              failures,
              local_choices,
          )
 -    if mode == "tests":
 +    if mode in ("design", "spec", "tests"):
-         check_test_markers(project["test_texts"], docs, selected, failures)
-     report_specs = selected
-     if failures:
-@@ -1696,7 +1696,7 @@ def _load_project(root, mode):
+         check_test_markers(
+             project["test_texts"], docs, selected, failures, bool(args["specs"])
+         )
+@@ -1757,7 +1757,7 @@ def _load_project(root, mode):
          spec_texts[rel_path] = text
      test_files = []
      test_texts = []

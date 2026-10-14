@@ -1,8 +1,8 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..e0e1c63 100644
+index 09caba9..80dc778 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -1279,6 +1279,9 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+@@ -1345,6 +1345,9 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
                      path=rel,
                  )
              )
@@ -12,7 +12,7 @@ index 19b939a..e0e1c63 100644
      for sid in selected:
          files = docs.get(sid, [])
          if len(files) > 1:
-@@ -1344,7 +1347,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
+@@ -1410,7 +1413,7 @@ def check_spec_bodies(docs, unknown, selected, report_unknown, active_ids, alloc
          clause_id_set = set(seen_clauses.keys())
          covered = set()
          for path, block in real_acceptances:
@@ -21,11 +21,11 @@ index 19b939a..e0e1c63 100644
              covered.update(declared)
              _wrong_implementations(block, path, failures)
          for path, block in real_clauses:
-@@ -1421,8 +1424,7 @@ def _coverage(block, owner, clause_ids, path, failures):
+@@ -1487,8 +1490,7 @@ def _coverage(block, owner, clause_ids, path, failures):
      declared = [part.strip() for part in match.group(1).split("、")]
      ok = set()
      for clause_id in declared:
--        prefix = clause_id.split("-C", 1)[0]
+-        prefix = _marked_spec(clause_id, CLAUSE_SUFFIX_RE)
 -        if prefix != owner or clause_id not in clause_ids:
 +        if clause_id not in clause_ids:
              failures.append(

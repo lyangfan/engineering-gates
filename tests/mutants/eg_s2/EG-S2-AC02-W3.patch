@@ -1,13 +1,13 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..8307d4e 100644
+index 09caba9..3922df1 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -37,7 +37,7 @@ TIER_RANK = {"轻量": 0, "标准": 1, "严格": 2}
+@@ -38,7 +38,7 @@ TIER_RANK = {"轻量": 0, "标准": 1, "严格": 2}
  TIER_HEADERS = ("spec", "规则结果", "确认档位", "理由")
  ALLOC_HEADERS = ("决定", "去向")
  
 -ID_RE = re.compile(r"^D-\d{3,}$")
 +ID_RE = re.compile(r"^D-\d{3}$")
  DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
- SPEC_ID_RE = re.compile(r"^EG-S\d+$")
  OPEN_FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,})([^`]*)\s*$")
+ CLOSE_FENCE_RE = re.compile(r"^[ ]{0,3}(`{3,})\s*$")

@@ -81,7 +81,8 @@
     "w": "EG-S2-AC07-W1",
     "patch": "EG-S2-AC07-W1.patch",
     "killing_tests": [
-      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac07_global_and_not_in_spec_rows_are_allocations"
+      "tests.acceptance.eg_s2.test_trace.SpecMapTests.test_ac07_global_and_not_in_spec_rows_are_allocations",
+      "tests.acceptance.eg_s2.test_trace_regress.AllocationLocationTests.test_ac07_missing_allocation_failure_points_into_its_path"
     ]
   },
   {
@@ -211,14 +212,18 @@
     "patch": "EG-S2-AC17-W1.patch",
     "killing_tests": [
       "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_missing_marker_reported_only_in_tests_mode",
-      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_unknown_acceptance_id_in_tests_fails"
+      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_unknown_acceptance_id_in_tests_fails",
+      "tests.acceptance.eg_s2.test_trace_regress.UnknownSpecTestMarkerTests.test_ac17_marker_with_prefix_outside_map_fails_without_spec"
     ]
   },
   {
     "w": "EG-S2-AC17-W2",
     "patch": "EG-S2-AC17-W2.patch",
     "killing_tests": [
-      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_marker_in_string_is_recognised"
+      "tests.acceptance.eg_s2.test_trace_specs.TestMarkerTests.test_ac17_marker_in_string_is_recognised",
+      "tests.acceptance.eg_s2.test_trace_regress.UnknownSpecTestMarkerTests.test_ac17_marker_with_prefix_outside_map_fails_without_spec",
+      "tests.acceptance.eg_s2.test_trace_regress.UnknownSpecTestMarkerTests.test_ac17_marker_for_spec_without_file_fails_without_spec",
+      "tests.acceptance.eg_s2.test_trace_regress.SpecIdFormTests.test_ac17_tests_mode_accepts_any_spec_id_form"
     ]
   },
   {

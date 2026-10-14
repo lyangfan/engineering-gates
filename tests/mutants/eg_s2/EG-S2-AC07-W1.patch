@@ -1,13 +1,13 @@
 diff --git a/scripts/egtrace/engine.py b/scripts/egtrace/engine.py
-index 19b939a..5a7f49f 100644
+index 09caba9..9adcbdf 100644
 --- a/scripts/egtrace/engine.py
 +++ b/scripts/egtrace/engine.py
-@@ -993,8 +993,9 @@ def evaluate_map(model, by_id, clause_ids, map_path, failures):
+@@ -1056,8 +1056,9 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
                      )
                  )
                  continue
 -            counts[did] = counts.get(did, 0) + 1
-             _kind, ids, error = parse_destination(dest)
+             _kind, ids, error = parse_destination(dest, model["spec_ids"])
 +            if _kind == "specs":
 +                counts[did] = counts.get(did, 0) + 1
              if error:
