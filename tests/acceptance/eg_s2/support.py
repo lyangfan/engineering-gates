@@ -423,8 +423,8 @@ class TraceTestCase(unittest.TestCase):
         return root
 
     # --- running ------------------------------------------------------------
-    def run_eg(self, args, cwd=None, python=None, script=None, env=None):
-        cmd = [python or sys.executable, str(script or EG_PY), "trace"] + list(args)
+    def run_eg(self, args, cwd=None, python=None, script=None, env=None, python_args=()):
+        cmd = [python or sys.executable] + list(python_args) + [str(script or EG_PY), "trace"] + list(args)
         proc = subprocess.run(
             cmd,
             cwd=str(cwd or self.empty_cwd),

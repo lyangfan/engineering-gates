@@ -243,11 +243,34 @@ class ReportTests(S.TraceTestCase):
         self.assertPass(res)
 
 
+# An empty -X pycache_prefix= clears any interpreter-default prefix (macOS system
+# Python 3.9 ships one outside the project), so bytecode would land in the
+# project's own __pycache__ where the snapshot sees it.
+BYTECODE_IN_SOURCE_TREE = ["-X", "pycache_prefix="]
+
+
 class ReadOnlyTests(S.TraceTestCase):
     """C20: the command never changes the project, including __pycache__."""
 
+    def _assert_child_would_write_bytecode_in_tree(self, env):
+        probe = subprocess.run(
+            [sys.executable] + BYTECODE_IN_SOURCE_TREE
+            + ["-c", "import sys; print(sys.pycache_prefix, sys.dont_write_bytecode)"],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=S.TIMEOUT,
+        )
+        self.assertEqual(
+            probe.stdout.decode().strip(),
+            "None False",
+            "test environment: child interpreter would not write bytecode next to sources "
+            "(see NOTES.md)\n" + probe.stderr.decode(errors="replace"),
+        )
+
     # eg:ac EG-S2-AC20
     def test_ac20_runs_leave_project_unchanged(self):
+        self._assert_child_would_write_bytecode_in_tree(S.clean_env(bytecode_guard=False))
         runs = [
             (["--mode", "design"], True),
             (["--mode", "spec"], True),
@@ -268,9 +291,16 @@ class ReadOnlyTests(S.TraceTestCase):
                 before = S.snapshot(root)
                 for (args, with_root), expected in zip(runs, codes):
                     if with_root:
-                        res = self.run_eg(args + ["--root", str(root)], script=script, env=env)
+                        res = self.run_eg(
+                            args + ["--root", str(root)],
+                            script=script,
+                            env=env,
+                            python_args=BYTECODE_IN_SOURCE_TREE,
+                        )
                     else:
-                        res = self.run_eg(args, cwd=root, script=script, env=env)
+                        res = self.run_eg(
+                            args, cwd=root, script=script, env=env, python_args=BYTECODE_IN_SOURCE_TREE
+                        )
                     self.assertEqual(res.code, expected, res.describe())
                 after = S.snapshot(root)
                 # W EG-S2-AC20-W1: a report/cache file written into the project shows up here.

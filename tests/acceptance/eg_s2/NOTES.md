@@ -44,3 +44,11 @@
 ## 4. 测试文件中的标记
 
 - 测试文件中的 `eg:ac EG-S2-ACnn` 字面量只用于本 spec 的真实验收。夹具里的测试标记在运行时由 `support.ac_marker()` 拼接生成，因此将来对本仓库运行 `trace --mode tests` 时，夹具中的 `EG-S2-AC99`、`EG-S1-AC99` 等不会被误认为本仓库的测试标记。
+
+## 5. AC20 修正：字节码写入位置不受解释器内置前缀影响（对应补丁检查存活者 EG-S2-AC20-W2）
+
+- 原因：macOS 系统 Python 3.9（`/usr/bin/python3`）自带非空的 `sys.pycache_prefix`（`~/Library/Caches/com.apple.python`），环境变量里没有 `PYTHONPYCACHEPREFIX` 时也是如此。原测试中，"导入后才关闭字节码写入"的错误实现会把字节码写到项目外的这个目录，运行前后的项目快照看不到，于是该补丁存活（见 `tests/mutants/eg_s2/SURVIVORS.md`）。`clean_env()` 只能去掉环境变量，去不掉这个内置默认值。
+- 没有采用"把 `PYTHONPYCACHEPREFIX` 指向 `--root` 内"的做法：实测设置前缀后，解释器启动阶段（`eg.py` 第一行执行之前）就会把约 40 个标准库模块的 `.pyc` 写进前缀目录，正确实现也会因此失败。
+- 做法：AC20 运行复制出的 `scripts/eg.py` 时，在解释器参数中加 `-X pycache_prefix=`（值为空）。CPython 3.8 起，空值的这个选项表示 `sys.pycache_prefix = None`，并且优先于环境变量和解释器内置默认值，于是项目模块的字节码只能写到源码旁的 `__pycache__`，也就是 `--root` 之内、快照覆盖的位置；标准库字节码仍写在项目外，不影响比较。`support.run_eg()` 为此增加了 `python_args` 参数，默认为空，其他测试的命令行不变。
+- 为避免在其他解释器上悄悄退化成空测试，AC20 先用同样的参数和环境启动子解释器，确认 `sys.pycache_prefix` 为 `None`、`sys.dont_write_bytecode` 为 `False`，不满足时测试失败并提示是测试环境问题。
+- 断言没有变：仍然只比较 `--root` 下全部目录与文件在运行前后是否一致（C20：只读，不产生包括 `__pycache__` 在内的任何文件）。
