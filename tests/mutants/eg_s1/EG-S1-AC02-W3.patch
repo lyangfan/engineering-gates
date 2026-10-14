@@ -1,0 +1,17 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..fc2c791 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -94,10 +94,10 @@ class Checkpoint(object):
+         self.root = root
+         self.git.cwd = root
+         try:
+-            message = self._check_paths()
++            message = self._check_branch()
+             if message:
+                 return self.refused(message)
+-            message = self._check_branch()
++            message = self._check_paths()
+             if message:
+                 return self.refused(message)
+             message = self._check_identity()

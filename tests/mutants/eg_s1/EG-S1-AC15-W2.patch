@@ -1,0 +1,21 @@
+diff --git a/scripts/egcheckpoint/gitrun.py b/scripts/egcheckpoint/gitrun.py
+index 7832077..536b7cd 100644
+--- a/scripts/egcheckpoint/gitrun.py
++++ b/scripts/egcheckpoint/gitrun.py
+@@ -96,13 +96,14 @@ class Git(object):
+             env = dict(self.env)
+             env.update(extra_env)
+         last = None
+-        for attempt in range(LOCK_ATTEMPTS):
++        attempt = 0
++        while True:
+             if attempt:
+                 time.sleep(LOCK_WAIT_SECONDS)
++            attempt += 1
+             last = self._once(cmd, env)
+             if last.timed_out or last.code == 0 or not is_lock_error(last.err):
+                 return last
+-        return last
+ 
+     def _once(self, args, env):
+         argv = [self.binary]

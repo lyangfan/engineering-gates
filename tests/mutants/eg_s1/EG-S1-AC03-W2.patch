@@ -1,0 +1,27 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..d2b93ab 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -196,6 +196,7 @@ class Checkpoint(object):
+ 
+     def _check_paths(self):
+         seen = set()
++        resolved = []
+         for path in self.paths:
+             reason = path_form_error(path)
+             if reason:
+@@ -204,8 +205,14 @@ class Checkpoint(object):
+                 return "路径 %s 重复出现" % path
+             seen.add(path)
+             kind = path_kind(self.root, path)
++            if kind == "symlink":
++                target = os.path.realpath(os.path.join(self.root, path))
++                path = os.path.relpath(target, os.path.realpath(self.root))
++                kind = path_kind(self.root, path)
+             if kind != "file":
+                 return "路径 %s %s" % (path, kind_message(kind))
++            resolved.append(path)
++        self.paths = resolved
+         return None
+ 
+     def _check_branch(self):

@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..70b976e 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -461,7 +461,7 @@ class Checkpoint(object):
+             return self.error("找到多个带有本次 EG-Run 的提交：%s" % "、".join(found))
+         sha = found[0]
+         parent, changed_paths = self._commit_paths(sha)
+-        if parent is None or set(changed_paths) != set(changed):
++        if parent is None or parent != self.recorded or set(changed_paths) != set(changed):
+             return self.error(
+                 "提交 %s 未通过核对：父提交或改动路径与本次有改动的路径不一致" % sha,
+                 commit=sha,

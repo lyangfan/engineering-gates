@@ -1,0 +1,21 @@
+diff --git a/scripts/egcheckpoint/identity.py b/scripts/egcheckpoint/identity.py
+index 05fedca..e420e94 100644
+--- a/scripts/egcheckpoint/identity.py
++++ b/scripts/egcheckpoint/identity.py
+@@ -75,7 +75,7 @@ class Identity(object):
+             )
+         if blob is None:
+             return self._done("missing", commit, None, None, working, False, "", 1)
+-        if working is None or working != digest:
++        if working is None or os.path.getsize(os.path.join(self.root, self.path)) != self.size:
+             return self._done("mismatch", commit, blob, digest, working, False, "", 1)
+         return self._done("match", commit, blob, digest, working, True, "", 0)
+ 
+@@ -199,6 +199,7 @@ class Identity(object):
+                 "git cat-file 失败：%s" % (data.err_text().strip() or data.code),
+             )
+         import hashlib
++        self.size = len(data.out)
+         return blob, hashlib.sha256(data.out).hexdigest()
+ 
+     def _working_sha(self):

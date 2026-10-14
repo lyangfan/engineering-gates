@@ -1,0 +1,24 @@
+diff --git a/scripts/egcheckpoint/gitrun.py b/scripts/egcheckpoint/gitrun.py
+index 7832077..0c23ff4 100644
+--- a/scripts/egcheckpoint/gitrun.py
++++ b/scripts/egcheckpoint/gitrun.py
+@@ -8,6 +8,7 @@ a separate budget.
+ """
+ 
+ import os
++import shlex
+ import shutil
+ import signal
+ import subprocess
+@@ -107,8 +108,10 @@ class Git(object):
+     def _once(self, args, env):
+         argv = [self.binary]
+         argv.extend(args)
++        command = " ".join(shlex.quote(arg) for arg in argv)
+         proc = subprocess.Popen(
+-            argv,
++            command,
++            shell=True,
+             cwd=self.cwd,
+             env=env,
+             stdin=subprocess.DEVNULL,

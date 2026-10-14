@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..9ae4d07 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -430,7 +430,7 @@ class Checkpoint(object):
+     def _restore(self, paths):
+         if not paths:
+             return True
+-        result = self.git.run(["reset", "-q", "--"] + list(paths), writes=True)
++        result = self.git.run(["reset", "-q"], writes=True)
+         return (not result.timed_out) and result.code == 0
+ 
+     def _still_staged(self, paths):

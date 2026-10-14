@@ -1,0 +1,18 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..c0403c3 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -274,13 +274,6 @@ class Checkpoint(object):
+                 overrides.append(key)
+         if overrides:
+             return "git 配置了会覆盖 user.* 的项：%s" % "、".join(overrides)
+-        missing = []
+-        for key in ("user.name", "user.email"):
+-            value = self._config_get(key)
+-            if value is None or value == "":
+-                missing.append(key)
+-        if missing:
+-            return "缺少 git 配置项：%s" % "、".join(missing)
+         return None
+ 
+     def _check_staged(self):

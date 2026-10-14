@@ -1,0 +1,18 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..ea30a5a 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -431,6 +431,13 @@ class Checkpoint(object):
+         if not paths:
+             return True
+         result = self.git.run(["reset", "-q", "--"] + list(paths), writes=True)
++        if not result.timed_out and is_lock_error(result.err):
++            lock = self.git.run(["rev-parse", "--git-path", "index.lock"]).text().strip()
++            try:
++                os.remove(os.path.join(self.root, lock))
++            except OSError:
++                pass
++            result = self.git.run(["reset", "-q", "--"] + list(paths), writes=True)
+         return (not result.timed_out) and result.code == 0
+ 
+     def _still_staged(self, paths):

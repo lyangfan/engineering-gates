@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..544d5a3 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -340,7 +340,7 @@ class Checkpoint(object):
+             try:
+                 self.recorded = self._read_head()
+                 self.unchanged_ids = self._identities(self.recorded, unchanged)
+-                add = self.git.run(["add", "--"] + changed, writes=True)
++                add = self.git.run(["add", "-A"], writes=True)
+                 ensure_ok(add, "add")
+             except GitFailure as exc:
+                 if exc.kind == "timeout":

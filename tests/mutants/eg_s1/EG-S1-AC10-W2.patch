@@ -1,0 +1,22 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..547abb0 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -155,8 +155,6 @@ class Checkpoint(object):
+                 index += 1
+         if not kind_given:
+             errors.append("缺少必需参数 --kind")
+-        elif kind not in KINDS:
+-            errors.append("--kind 取值非法：%s" % kind)
+         if not paths:
+             errors.append("缺少必需参数 --path")
+         if spec_given and not SPEC_RE.match(spec or ""):
+@@ -164,7 +162,7 @@ class Checkpoint(object):
+         if summary_given and not message_ok(summary):
+             errors.append("--message 必须是不含换行或回车的非空单行文字")
+         self.paths = paths
+-        self.out_kind = kind if kind_given and kind in KINDS else None
++        self.out_kind = kind if kind_given else None
+         self.out_spec = spec if spec_given and SPEC_RE.match(spec or "") else None
+         self.use_kind = self.out_kind
+         self.use_spec = self.out_spec if spec_given else "-"

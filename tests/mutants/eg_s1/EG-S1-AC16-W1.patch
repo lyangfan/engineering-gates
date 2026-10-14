@@ -1,0 +1,24 @@
+diff --git a/scripts/egcheckpoint/common.py b/scripts/egcheckpoint/common.py
+index 621b9e6..1a08bdd 100644
+--- a/scripts/egcheckpoint/common.py
++++ b/scripts/egcheckpoint/common.py
+@@ -94,12 +94,13 @@ def path_kind(root, rel):
+ 
+ 
+ def kind_message(kind):
+-    if kind == "missing":
+-        return "在工作区中不存在"
+-    if kind == "symlink":
+-        return "是符号链接，不是普通文件"
+-    if kind == "dir":
+-        return "是目录，不是普通文件"
++    match kind:
++        case "missing":
++            return "在工作区中不存在"
++        case "symlink":
++            return "是符号链接，不是普通文件"
++        case "dir":
++            return "是目录，不是普通文件"
+     return "不是普通文件"
+ 
+ 

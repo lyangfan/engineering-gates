@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/identity.py b/scripts/egcheckpoint/identity.py
+index 05fedca..e3610eb 100644
+--- a/scripts/egcheckpoint/identity.py
++++ b/scripts/egcheckpoint/identity.py
+@@ -141,8 +141,6 @@ class Identity(object):
+         if reason:
+             return "路径 %s %s" % (self.path, reason)
+         kind = path_kind(self.root, self.path)
+-        if kind == "missing":
+-            return None
+         if kind != "file":
+             return "路径 %s %s" % (self.path, kind_message(kind))
+         return None

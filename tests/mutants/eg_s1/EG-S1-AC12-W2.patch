@@ -1,0 +1,35 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..bedce55 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -443,29 +443,7 @@ class Checkpoint(object):
+         return [path for path in paths if path in names]
+ 
+     def _verify(self, changed, unchanged, run_id):
+-        listing = self.git.run(["rev-list", "%s..HEAD" % self.recorded])
+-        ensure_ok(listing, "rev-list")
+-        found = []
+-        for sha in listing.text().split():
+-            trailer = self.git.run(
+-                ["log", "-1", "--format=%(trailers:key=EG-Run,valueonly)", sha]
+-            )
+-            ensure_ok(trailer, "log")
+-            if trailer.text().strip() == run_id:
+-                found.append(sha)
+-        if len(found) != 1:
+-            if not found:
+-                return self.error(
+-                    "git commit 已返回成功，但在记录的 HEAD 与当前 HEAD 之间没有找到带有本次 EG-Run 的提交"
+-                )
+-            return self.error("找到多个带有本次 EG-Run 的提交：%s" % "、".join(found))
+-        sha = found[0]
+-        parent, changed_paths = self._commit_paths(sha)
+-        if parent is None or set(changed_paths) != set(changed):
+-            return self.error(
+-                "提交 %s 未通过核对：父提交或改动路径与本次有改动的路径不一致" % sha,
+-                commit=sha,
+-            )
++        sha = self._read_head()
+         committed = self._identities(sha, changed)
+         items = []
+         for path in self.paths:

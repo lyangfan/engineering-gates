@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..5ebdbe1 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -231,7 +231,7 @@ class Checkpoint(object):
+             return "当前处于分离 HEAD，不能提交"
+         name = ref[len("refs/heads/"):]
+         self.branch = name
+-        if not name.startswith("eg/"):
++        if name == "main":
+             return "当前分支 %s 不以 eg/ 开头" % name
+         head = self.git.run(["rev-parse", "--verify", "--quiet", "HEAD"])
+         if head.timed_out:

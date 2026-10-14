@@ -1,0 +1,333 @@
+[
+  {
+    "w": "EG-S1-AC01-W1",
+    "patch": "EG-S1-AC01-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC01OutputChannels.test_ac01_checkpoint_stdout_is_one_json_object",
+      "tests.acceptance.eg_s1.test_checkpoint.AC01OutputChannels.test_ac01_failure_stdout_is_one_json_object",
+      "tests.acceptance.eg_s1.test_checkpoint.AC01OutputChannels.test_ac01_identity_stdout_is_one_json_object"
+    ]
+  },
+  {
+    "w": "EG-S1-AC02-W1",
+    "patch": "EG-S1-AC02-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC02ExitCodes.test_ac02_main_branch_refused_exit_1"
+    ]
+  },
+  {
+    "w": "EG-S1-AC02-W2",
+    "patch": "EG-S1-AC02-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC02ExitCodes.test_ac02_not_a_git_repository_exit_2"
+    ]
+  },
+  {
+    "w": "EG-S1-AC02-W3",
+    "patch": "EG-S1-AC02-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC02ExitCodes.test_ac02_path_checked_before_branch"
+    ]
+  },
+  {
+    "w": "EG-S1-AC03-W1",
+    "patch": "EG-S1-AC03-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC03Paths.test_ac03_invalid_paths_refused_without_changes"
+    ]
+  },
+  {
+    "w": "EG-S1-AC03-W2",
+    "patch": "EG-S1-AC03-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC03Paths.test_ac03_invalid_paths_refused_without_changes"
+    ]
+  },
+  {
+    "w": "EG-S1-AC03-W3",
+    "patch": "EG-S1-AC03-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC03Paths.test_ac03_subdirectory_same_as_root"
+    ]
+  },
+  {
+    "w": "EG-S1-AC04-W1",
+    "patch": "EG-S1-AC04-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC04Branch.test_ac04_non_eg_branches_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC04-W2",
+    "patch": "EG-S1-AC04-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC04Branch.test_ac04_non_eg_branches_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC05-W1",
+    "patch": "EG-S1-AC05-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_empty_user_name_refused",
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_single_missing_identity_key_named",
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_unconfigured_identity_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC05-W2",
+    "patch": "EG-S1-AC05-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_empty_user_name_refused",
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_single_missing_identity_key_named",
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_unconfigured_identity_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC05-W3",
+    "patch": "EG-S1-AC05-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_identity_environment_variables_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC05-W4",
+    "patch": "EG-S1-AC05-W4.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC05Identity.test_ac05_identity_override_config_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC06-W1",
+    "patch": "EG-S1-AC06-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC06StagedContent.test_ac06_user_staged_version_preserved"
+    ]
+  },
+  {
+    "w": "EG-S1-AC07-W1",
+    "patch": "EG-S1-AC07-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC07Changes.test_ac07_all_unchanged_refused"
+    ]
+  },
+  {
+    "w": "EG-S1-AC07-W2",
+    "patch": "EG-S1-AC07-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC07Changes.test_ac07_partially_unchanged_commits_changed_only"
+    ]
+  },
+  {
+    "w": "EG-S1-AC07-W3",
+    "patch": "EG-S1-AC07-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC07Changes.test_ac07_exec_bit_only_change_committed"
+    ]
+  },
+  {
+    "w": "EG-S1-AC08-W1",
+    "patch": "EG-S1-AC08-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC08CommitSteps.test_ac08_new_untracked_file_committed",
+      "tests.acceptance.eg_s1.test_checkpoint.AC08CommitSteps.test_ac08_only_add_and_commit_are_written"
+    ]
+  },
+  {
+    "w": "EG-S1-AC08-W2",
+    "patch": "EG-S1-AC08-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC08CommitSteps.test_ac08_only_add_and_commit_are_written"
+    ]
+  },
+  {
+    "w": "EG-S1-AC09-W1",
+    "patch": "EG-S1-AC09-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC09UnrelatedPaths.test_ac09_unrelated_state_preserved"
+    ]
+  },
+  {
+    "w": "EG-S1-AC09-W2",
+    "patch": "EG-S1-AC09-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC09UnrelatedPaths.test_ac09_unrelated_state_preserved"
+    ]
+  },
+  {
+    "w": "EG-S1-AC10-W1",
+    "patch": "EG-S1-AC10-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_defaults",
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_message_format_and_trailers",
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_run_ids_differ"
+    ]
+  },
+  {
+    "w": "EG-S1-AC10-W2",
+    "patch": "EG-S1-AC10-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_invalid_arguments_exit_2"
+    ]
+  },
+  {
+    "w": "EG-S1-AC10-W3",
+    "patch": "EG-S1-AC10-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_invalid_arguments_exit_2"
+    ]
+  },
+  {
+    "w": "EG-S1-AC10-W4",
+    "patch": "EG-S1-AC10-W4.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC10Message.test_ac10_run_ids_differ"
+    ]
+  },
+  {
+    "w": "EG-S1-AC11-W1",
+    "patch": "EG-S1-AC11-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC11FailureRecovery.test_ac11_failing_pre_commit_hook_refused_and_restored"
+    ]
+  },
+  {
+    "w": "EG-S1-AC11-W2",
+    "patch": "EG-S1-AC11-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC11FailureRecovery.test_ac11_failing_pre_commit_hook_refused_and_restored"
+    ]
+  },
+  {
+    "w": "EG-S1-AC11-W3",
+    "patch": "EG-S1-AC11-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC11FailureRecovery.test_ac11_lock_held_after_add_reports_staged_paths"
+    ]
+  },
+  {
+    "w": "EG-S1-AC12-W1",
+    "patch": "EG-S1-AC12-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC12CommitVerification.test_ac12_worktree_changed_after_commit_before_read_back"
+    ]
+  },
+  {
+    "w": "EG-S1-AC12-W2",
+    "patch": "EG-S1-AC12-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC12CommitVerification.test_ac12_post_commit_hook_commits_again",
+      "tests.acceptance.eg_s1.test_faults.AC12CommitVerification.test_ac12_pre_commit_hook_alters_committed_paths"
+    ]
+  },
+  {
+    "w": "EG-S1-AC12-W3",
+    "patch": "EG-S1-AC12-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC12CommitVerification.test_ac12_concurrent_commit_before_own_commit"
+    ]
+  },
+  {
+    "w": "EG-S1-AC13-W1",
+    "patch": "EG-S1-AC13-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_modified_file_mismatch_same_size_and_mtime"
+    ]
+  },
+  {
+    "w": "EG-S1-AC13-W2",
+    "patch": "EG-S1-AC13-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_at_selects_the_commit",
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_deleted_file_against_old_commit",
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_unresolvable_at_exit_2"
+    ]
+  },
+  {
+    "w": "EG-S1-AC13-W3",
+    "patch": "EG-S1-AC13-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_deleted_file_against_old_commit",
+      "tests.acceptance.eg_s1.test_identity.AC13Identity.test_ac13_path_not_in_commit_is_missing"
+    ]
+  },
+  {
+    "w": "EG-S1-AC14-W1",
+    "patch": "EG-S1-AC14-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC14Timeout.test_ac14_timeout_terminates_hook_process_group"
+    ]
+  },
+  {
+    "w": "EG-S1-AC14-W2",
+    "patch": "EG-S1-AC14-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC14Timeout.test_ac14_timeout_terminates_hook_process_group"
+    ]
+  },
+  {
+    "w": "EG-S1-AC14-W3",
+    "patch": "EG-S1-AC14-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC14Timeout.test_ac14_source_never_uses_a_shell"
+    ]
+  },
+  {
+    "w": "EG-S1-AC15-W1",
+    "patch": "EG-S1-AC15-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_concurrency.AC15ConcurrentCheckpoints.test_ac15_two_concurrent_checkpoints_keep_invariants",
+      "tests.acceptance.eg_s1.test_faults.AC15LockRetry.test_ac15_held_lock_bounded_retries",
+      "tests.acceptance.eg_s1.test_faults.AC15LockRetry.test_ac15_lock_released_before_second_retry"
+    ]
+  },
+  {
+    "w": "EG-S1-AC15-W2",
+    "patch": "EG-S1-AC15-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC15LockRetry.test_ac15_held_lock_bounded_retries"
+    ]
+  },
+  {
+    "w": "EG-S1-AC15-W3",
+    "patch": "EG-S1-AC15-W3.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_faults.AC15LockRetry.test_ac15_lock_released_before_second_retry"
+    ]
+  },
+  {
+    "w": "EG-S1-AC16-W1",
+    "patch": "EG-S1-AC16-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_environment.AC16Environment.test_ac16_sources_compile_with_python39",
+      "tests.acceptance.eg_s1.test_environment.AC16Environment.test_ac16_sources_do_not_import_science_gates",
+      "tests.acceptance.eg_s1.test_environment.AC16Environment.test_ac16_sources_import_only_stdlib_and_local_modules"
+    ]
+  },
+  {
+    "w": "EG-S1-AC16-W2",
+    "patch": "EG-S1-AC16-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_environment.AC16Environment.test_ac16_sources_import_only_stdlib_and_local_modules"
+    ]
+  },
+  {
+    "w": "EG-S1-AC17-W1",
+    "patch": "EG-S1-AC17-W1.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_argument_error_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_branch_refusal_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_environment_usage_errors_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_hook_failure_output"
+    ]
+  },
+  {
+    "w": "EG-S1-AC17-W2",
+    "patch": "EG-S1-AC17-W2.patch",
+    "killing_tests": [
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_argument_error_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_branch_refusal_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_environment_usage_errors_output",
+      "tests.acceptance.eg_s1.test_checkpoint.AC17FailureOutput.test_ac17_hook_failure_output"
+    ]
+  }
+]

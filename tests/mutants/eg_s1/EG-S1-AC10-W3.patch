@@ -1,0 +1,10 @@
+diff --git a/scripts/egcheckpoint/common.py b/scripts/egcheckpoint/common.py
+index 621b9e6..9cfab55 100644
+--- a/scripts/egcheckpoint/common.py
++++ b/scripts/egcheckpoint/common.py
+@@ -127,4 +127,4 @@ def file_sha256(path):
+ 
+ 
+ def message_ok(text):
+-    return bool(text) and "\n" not in text and "\r" not in text
++    return bool(text)

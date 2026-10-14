@@ -1,0 +1,18 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..33a1c37 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -224,11 +224,11 @@ class Checkpoint(object):
+                     "git symbolic-ref 失败：%s" % (result.err_text().strip() or result.code),
+                 )
+             self.branch = None
+-            return "当前处于分离 HEAD，不能提交"
++            return None
+         ref = result.text().strip()
+         if not ref.startswith("refs/heads/"):
+             self.branch = None
+-            return "当前处于分离 HEAD，不能提交"
++            return None
+         name = ref[len("refs/heads/"):]
+         self.branch = name
+         if not name.startswith("eg/"):

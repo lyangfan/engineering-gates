@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..ef12aac 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -350,7 +350,7 @@ class Checkpoint(object):
+             msg_path = _write_message(self.use_kind, self.use_spec, self.use_summary, run_id)
+             trace_path = _trace_file()
+             result = self.git.run(
+-                ["commit", "--only", "--cleanup=verbatim", "-F", msg_path, "--"] + changed,
++                ["commit", "--cleanup=verbatim", "-F", msg_path],
+                 extra_env={"GIT_TRACE2_EVENT": trace_path},
+                 writes=True,
+             )

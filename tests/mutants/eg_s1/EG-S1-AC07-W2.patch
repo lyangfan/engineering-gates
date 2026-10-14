@@ -1,0 +1,15 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..bfa99f2 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -109,8 +109,8 @@ class Checkpoint(object):
+             changed, unchanged = self._partition()
+         except GitFailure as exc:
+             return self.error(exc.message)
+-        if not changed:
+-            return self.refused("列出的路径都没有改动，拒绝产生空提交")
++        if unchanged:
++            return self.refused("列出的路径 %s 没有改动" % "、".join(unchanged))
+         return self._commit(changed, unchanged)
+ 
+     def _parse(self):

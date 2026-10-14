@@ -1,0 +1,17 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..c63a7c7 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -268,12 +268,6 @@ class Checkpoint(object):
+         present = [name for name in IDENTITY_ENV if name in os.environ]
+         if present:
+             return "环境变量会覆盖提交者身份：%s" % "、".join(present)
+-        overrides = []
+-        for key in OVERRIDE_KEYS:
+-            if self._config_get(key) is not None:
+-                overrides.append(key)
+-        if overrides:
+-            return "git 配置了会覆盖 user.* 的项：%s" % "、".join(overrides)
+         missing = []
+         for key in ("user.name", "user.email"):
+             value = self._config_get(key)

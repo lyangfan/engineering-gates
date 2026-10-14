@@ -1,0 +1,30 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..15cd5fa 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -196,6 +196,7 @@ class Checkpoint(object):
+ 
+     def _check_paths(self):
+         seen = set()
++        expanded = []
+         for path in self.paths:
+             reason = path_form_error(path)
+             if reason:
+@@ -204,8 +205,17 @@ class Checkpoint(object):
+                 return "路径 %s 重复出现" % path
+             seen.add(path)
+             kind = path_kind(self.root, path)
++            if kind == "dir":
++                for dirpath, dirnames, filenames in os.walk(os.path.join(self.root, path)):
++                    for name in sorted(filenames):
++                        expanded.append(
++                            os.path.relpath(os.path.join(dirpath, name), self.root)
++                        )
++                continue
+             if kind != "file":
+                 return "路径 %s %s" % (path, kind_message(kind))
++            expanded.append(path)
++        self.paths = expanded
+         return None
+ 
+     def _check_branch(self):

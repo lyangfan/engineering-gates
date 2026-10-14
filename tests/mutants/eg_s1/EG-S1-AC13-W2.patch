@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/identity.py b/scripts/egcheckpoint/identity.py
+index 05fedca..62401ed 100644
+--- a/scripts/egcheckpoint/identity.py
++++ b/scripts/egcheckpoint/identity.py
+@@ -148,7 +148,7 @@ class Identity(object):
+         return None
+ 
+     def _resolve(self):
+-        spec = "%s^{commit}" % self.at
++        spec = "HEAD^{commit}"
+         result = self.git.run(["rev-parse", "--verify", "--end-of-options", spec])
+         if result.timed_out:
+             raise GitFailure("timeout", "git 超时：rev-parse")

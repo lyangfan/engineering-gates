@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/gitrun.py b/scripts/egcheckpoint/gitrun.py
+index 7832077..83694e5 100644
+--- a/scripts/egcheckpoint/gitrun.py
++++ b/scripts/egcheckpoint/gitrun.py
+@@ -14,7 +14,7 @@ import subprocess
+ import time
+ 
+ # Five attempts total: the original call plus four retries.
+-LOCK_ATTEMPTS = 5
++LOCK_ATTEMPTS = 1
+ # Four gaps. 0.25 * 4 = 1.0s, within the 2s budget.
+ LOCK_WAIT_SECONDS = 0.25
+ TERM_GRACE_SECONDS = 10

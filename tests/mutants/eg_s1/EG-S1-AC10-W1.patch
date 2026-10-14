@@ -1,0 +1,19 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..618379b 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -523,13 +523,10 @@ class Checkpoint(object):
+ 
+ 
+ def _write_message(kind, spec, summary, run_id):
+-    text = "eg(%s): %s %s\n\nEG-Kind: %s\nEG-Spec: %s\nEG-Run: %s\n" % (
++    text = "eg(%s): %s %s\n" % (
+         kind,
+         spec,
+         summary,
+-        kind,
+-        spec,
+-        run_id,
+     )
+     fd, path = tempfile.mkstemp(prefix="eg-checkpoint-msg-")
+     try:

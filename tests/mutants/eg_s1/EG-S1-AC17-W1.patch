@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..baee82d 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -510,6 +510,8 @@ class Checkpoint(object):
+             summary = "committed %s on %s" % (commit, self.branch or "")
+         else:
+             summary = "%s: %s" % (result, message)
++            print(summary)
++            return code
+         return emit_json(payload, summary, code)
+ 
+     def usage(self, message):

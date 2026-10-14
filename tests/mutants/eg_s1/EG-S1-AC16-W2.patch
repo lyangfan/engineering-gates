@@ -1,0 +1,24 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..7e3b2bc 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -15,6 +15,8 @@ import os
+ import secrets
+ import tempfile
+ 
++import git as gitpython
++
+ from .common import (
+     IDENTITY_ENV,
+     KINDS,
+@@ -175,6 +177,10 @@ class Checkpoint(object):
+         return "；".join(errors)
+ 
+     def _discover(self):
++        try:
++            return gitpython.Repo(os.getcwd(), search_parent_directories=True).working_tree_dir
++        except gitpython.InvalidGitRepositoryError:
++            return None
+         result = self.git.run(["rev-parse", "--show-toplevel"])
+         if result.timed_out:
+             raise GitFailure("timeout", "git 超时：rev-parse --show-toplevel")

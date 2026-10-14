@@ -1,0 +1,14 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..7f8b950 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -265,9 +265,6 @@ class Checkpoint(object):
+         )
+ 
+     def _check_identity(self):
+-        present = [name for name in IDENTITY_ENV if name in os.environ]
+-        if present:
+-            return "环境变量会覆盖提交者身份：%s" % "、".join(present)
+         overrides = []
+         for key in OVERRIDE_KEYS:
+             if self._config_get(key) is not None:

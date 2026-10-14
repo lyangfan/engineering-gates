@@ -1,0 +1,21 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..ce1f2bd 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -92,7 +92,6 @@ class Checkpoint(object):
+         if root is None:
+             return self.usage("当前目录不在 git 仓库中")
+         self.root = root
+-        self.git.cwd = root
+         try:
+             message = self._check_paths()
+             if message:
+@@ -203,7 +202,7 @@ class Checkpoint(object):
+             if path in seen:
+                 return "路径 %s 重复出现" % path
+             seen.add(path)
+-            kind = path_kind(self.root, path)
++            kind = path_kind(os.getcwd(), path)
+             if kind != "file":
+                 return "路径 %s %s" % (path, kind_message(kind))
+         return None

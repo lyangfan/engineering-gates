@@ -1,0 +1,23 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..39644c5 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -22,6 +22,7 @@ from .common import (
+     SPEC_RE,
+     emit_json,
+     failure_path_items,
++    file_sha256,
+     kind_message,
+     message_ok,
+     parse_timeout,
+@@ -496,6 +497,10 @@ class Checkpoint(object):
+     def emit(self, code, result, message, commit=None, items=None, success=False):
+         if items is None:
+             items = failure_path_items(self.paths)
++            for item in items:
++                full = os.path.join(self.root or os.getcwd(), item["path"])
++                if os.path.isfile(full):
++                    item["sha256"] = file_sha256(full)
+         payload = {
+             "schema": "eg-checkpoint/v1",
+             "result": result,

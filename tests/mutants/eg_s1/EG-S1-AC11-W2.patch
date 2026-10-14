@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..5f60767 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -416,6 +416,8 @@ class Checkpoint(object):
+         return found
+ 
+     def _finish_restore(self, paths, reason, hook):
++        if hook:
++            return self.refused(reason)
+         if self._restore(paths):
+             if hook:
+                 return self.refused(reason)

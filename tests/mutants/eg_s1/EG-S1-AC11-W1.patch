@@ -1,0 +1,20 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..f6b0a75 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -356,7 +356,14 @@ class Checkpoint(object):
+             )
+             if result.timed_out or result.code != 0:
+                 reason, hook = self._classify_commit(result, trace_path)
+-                return self._finish_restore(changed, reason, hook)
++                if hook:
++                    result = self.git.run(
++                        ["commit", "--only", "--no-verify", "--cleanup=verbatim", "-F", msg_path,
++                         "--"] + changed,
++                        writes=True,
++                    )
++                if result.timed_out or result.code != 0:
++                    return self._finish_restore(changed, reason, hook)
+             try:
+                 return self._verify(changed, unchanged, run_id)
+             except GitFailure as exc:

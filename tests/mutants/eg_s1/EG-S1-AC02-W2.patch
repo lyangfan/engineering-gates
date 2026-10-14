@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..afb4664 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -90,7 +90,7 @@ class Checkpoint(object):
+         except GitFailure as exc:
+             return self.error(exc.message)
+         if root is None:
+-            return self.usage("当前目录不在 git 仓库中")
++            return self.error("当前目录不在 git 仓库中")
+         self.root = root
+         self.git.cwd = root
+         try:

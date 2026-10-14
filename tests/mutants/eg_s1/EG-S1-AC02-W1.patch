@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..22052f9 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -99,7 +99,7 @@ class Checkpoint(object):
+                 return self.refused(message)
+             message = self._check_branch()
+             if message:
+-                return self.refused(message)
++                return self.emit(2, "refused", message)
+             message = self._check_identity()
+             if message:
+                 return self.refused(message)

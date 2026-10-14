@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/gitrun.py b/scripts/egcheckpoint/gitrun.py
+index 7832077..a8eb2f4 100644
+--- a/scripts/egcheckpoint/gitrun.py
++++ b/scripts/egcheckpoint/gitrun.py
+@@ -118,7 +118,7 @@ class Git(object):
+         )
+         try:
+             try:
+-                out, err = proc.communicate(timeout=self.timeout)
++                out, err = proc.communicate()
+                 return GitResult(proc.returncode, out, err, False)
+             except subprocess.TimeoutExpired:
+                 self._signal_group(proc, signal.SIGTERM)

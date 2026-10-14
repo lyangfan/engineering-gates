@@ -1,0 +1,15 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..bf7472c 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -304,7 +304,9 @@ class Checkpoint(object):
+         tracked = [path for path in self.paths if path in in_head]
+         differ = set()
+         if tracked:
+-            diff = self.git.run(["diff", "--name-only", "-z", "HEAD", "--"] + tracked)
++            diff = self.git.run(
++                ["-c", "core.fileMode=false", "diff", "--name-only", "-z", "HEAD", "--"] + tracked
++            )
+             ensure_ok(diff, "diff", ok=(0, 1))
+             differ = set(split_z(diff.out))
+         changed = []

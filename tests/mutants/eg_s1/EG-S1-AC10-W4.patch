@@ -1,0 +1,13 @@
+diff --git a/scripts/egcheckpoint/checkpoint.py b/scripts/egcheckpoint/checkpoint.py
+index 11f606c..dce0228 100644
+--- a/scripts/egcheckpoint/checkpoint.py
++++ b/scripts/egcheckpoint/checkpoint.py
+@@ -346,7 +346,7 @@ class Checkpoint(object):
+                 if exc.kind == "timeout":
+                     return self._finish_restore(changed, exc.message, False)
+                 return self.error(exc.message)
+-            run_id = secrets.token_hex(16)
++            run_id = "0" * 32
+             msg_path = _write_message(self.use_kind, self.use_spec, self.use_summary, run_id)
+             trace_path = _trace_file()
+             result = self.git.run(

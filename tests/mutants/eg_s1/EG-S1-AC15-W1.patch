@@ -1,0 +1,25 @@
+diff --git a/scripts/egcheckpoint/gitrun.py b/scripts/egcheckpoint/gitrun.py
+index 7832077..002ff90 100644
+--- a/scripts/egcheckpoint/gitrun.py
++++ b/scripts/egcheckpoint/gitrun.py
+@@ -8,6 +8,7 @@ a separate budget.
+ """
+ 
+ import os
++import re
+ import shutil
+ import signal
+ import subprocess
+@@ -102,6 +103,12 @@ class Git(object):
+             last = self._once(cmd, env)
+             if last.timed_out or last.code == 0 or not is_lock_error(last.err):
+                 return last
++            found = re.search(r"'([^']*index\.lock)'", last.err_text())
++            if found:
++                try:
++                    os.remove(os.path.join(self.cwd, found.group(1)))
++                except OSError:
++                    pass
+         return last
+ 
+     def _once(self, args, env):
