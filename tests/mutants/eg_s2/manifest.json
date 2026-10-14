@@ -276,7 +276,9 @@
   {
     "w": "EG-S2-AC20-W2",
     "patch": "EG-S2-AC20-W2.patch",
-    "killing_tests": []
+    "killing_tests": [
+      "tests.acceptance.eg_s2.test_trace_cli.ReadOnlyTests.test_ac20_runs_leave_project_unchanged"
+    ]
   },
   {
     "w": "EG-S2-AC21-W1",
