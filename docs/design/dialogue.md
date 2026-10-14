@@ -279,3 +279,7 @@ C1 审查（新会话，临时仓库实测）裁定 FAIL：B1 关闭 11/12；v0.
 ### EG-S1 冻结与阶段 6 启动 {#s1-frozen}
 
 EG-S1 经 B1 FAIL → C1 FAIL → C2 PASS 冻结于 commit `3955513`（严格档预算用满）。用户认可局部选择 C01、C04（D-011）。用户决定 EG-S1、EG-S2 进入阶段 6：由独立测试作者只依据 spec 写验收测试（D-013）。在 EG-S1 实现之前，测试冻结提交由协调者以 git 直接提交，提交信息按 EG-S1-C10 的格式手写（自举）。
+
+### 同步到 GitHub {#github-sync}
+
+用户授权把仓库同步到 `github.com/lyangfan/engineering-gates`（公开仓库，用户已把名字从 `engineering_gates` 改为 `engineering-gates`）。远端原有一个 GitHub 自动生成的 `Initial commit`（只含 LICENSE），与本地历史无共同祖先。为不覆盖远端、也不改写本地提交号（D-015 的身份引用依赖它们），在 `main` 上以 `--allow-unrelated-histories` 合并远端历史，得到 `49a9ca2`；LICENSE 冲突按用户选择采用远端版本（版权人 `lyangfan`）。推送 `main` 与 `eg/v2`，未使用强制推送；冻结记录引用的提交均保留在 `eg/v2` 上。Q-14 的其余问题仍待讨论。
