@@ -47,8 +47,11 @@ HEADING_RE = re.compile(r"^[ ]{0,3}(#{1,6})[ \t]+(.+?)\s*$")
 # whitespace are excluded only so the marker and table grammars stay parseable.
 CLAUSE_RE = re.compile(r"^\*\*\[([^\]\s]+?)-C(\d{2,})\]\*\*(.*)$")
 ACCEPTANCE_RE = re.compile(r"^\*\*\[([^\]\s]+?)-AC(\d{2,})\]\*\*(.*)$")
+# C14 ends the coverage declaration at the first fullwidth colon. The id
+# class must not include that colon, or a later "clause id：" on the same
+# line is swallowed into the declaration.
 COVERAGE_RE = re.compile(
-    r"^\s*覆盖\s*((?:[^\s、]+-C\d{2,})(?:\s*、\s*[^\s、]+-C\d{2,})*)\s*："
+    r"^\s*覆盖\s*((?:[^\s、：]+-C\d{2,})(?:\s*、\s*[^\s、：]+-C\d{2,})*)\s*："
 )
 DESIGN_ID_RE = re.compile(r"(?<![A-Za-z0-9])(D-\d{3,})(?![A-Za-z0-9])")
 DEC_REF_RE = re.compile(r"(?<![A-Za-z0-9])(D-\d+)(?![A-Za-z0-9])")
@@ -1042,6 +1045,7 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
             )
     allocations = {sid: set() for sid in model["spec_ids"]}
     counts = {}
+    alloc_lines = {}
     if model["alloc_rows"]:
         for line, cells in model["alloc_rows"]:
             did = _cell(cells, 0)
@@ -1057,6 +1061,7 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
                 )
                 continue
             counts[did] = counts.get(did, 0) + 1
+            alloc_lines.setdefault(did, []).append(line)
             _kind, ids, error = parse_destination(dest, model["spec_ids"])
             if error:
                 failures.append(
@@ -1101,7 +1106,10 @@ def evaluate_map(model, by_id, clause_ids, map_path, decisions_path, failures):
                 )
             else:
                 message = "active 决定 %s 在决定分配表中出现了 %d 次" % (decision.id, count)
-                failures.append(problem("EG-S2-C07", message, path=map_path, line=decision.line))
+                lines = alloc_lines.get(decision.id, [])
+                # The extra row is in the allocation table, so line stays in map_path.
+                dup_line = lines[1] if len(lines) > 1 else None
+                failures.append(problem("EG-S2-C07", message, path=map_path, line=dup_line))
     if headers_ok and model["tier_rows"]:
         columns = {}
         for offset, sid in enumerate(header_ids):
