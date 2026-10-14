@@ -7,12 +7,18 @@ test_environment.py.
 
 import os
 import shutil
+import subprocess
 import tempfile
 import unittest
 
 from . import support
 from .support import (EgTestCase, FIXTURE_EMAIL, HEX40, IDENTITY_ENV_VARS,
                       IDENTITY_OVERRIDE_KEYS, RUN_ID, read_jsonl, sha256)
+
+# An empty -X pycache_prefix= clears any interpreter-default prefix (macOS system
+# Python 3.9 ships one under $HOME), so bytecode of the project's modules could
+# only land in __pycache__ next to the sources, where the test looks.
+BYTECODE_IN_SOURCE_TREE = ['-X', 'pycache_prefix=']
 
 
 class AC01OutputChannels(EgTestCase):
@@ -61,9 +67,20 @@ class AC01OutputChannels(EgTestCase):
         eg_copy = os.path.join(copy_root, 'scripts', 'eg.py')
         fx = self.fixture()
         fx.append('a.txt', 'more\n')
-        res = fx.checkpoint('--kind', 'candidate', '--path', 'a.txt', eg_py=eg_copy)
+        probe = subprocess.run(
+            [support.PYTHON] + BYTECODE_IN_SOURCE_TREE
+            + ['-c', 'import sys; print(sys.pycache_prefix, sys.dont_write_bytecode)'],
+            cwd=fx.root, env=fx.env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, timeout=support.DEFAULT_RUN_TIMEOUT)
+        self.assertEqual(probe.stdout.decode().strip(), 'None False',
+                         'test environment: child interpreter would not write bytecode '
+                         'next to sources (see NOTES.md)\n'
+                         + probe.stderr.decode('utf-8', 'replace'))
+        res = fx.checkpoint('--kind', 'candidate', '--path', 'a.txt', eg_py=eg_copy,
+                            python_args=BYTECODE_IN_SOURCE_TREE)
         self.assertExit(res, 0)
-        res = fx.identity('--path', 'a.txt', eg_py=eg_copy)
+        res = fx.identity('--path', 'a.txt', eg_py=eg_copy,
+                          python_args=BYTECODE_IN_SOURCE_TREE)
         self.assertExit(res, 0)
         for top in (copy_root, fx.root):
             for dirpath, dirnames, filenames in os.walk(top):

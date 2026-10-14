@@ -8,6 +8,7 @@ started by a test are killed during cleanup.
 import ast
 import os
 import signal
+import subprocess
 import time
 import unittest
 
@@ -206,13 +207,22 @@ class AC14Timeout(EgTestCase):
         pre_entry = fx.index_entry('a.txt')
         hook_pid = os.path.join(fx.aux, 'hook.pid')
         child_pid = os.path.join(fx.aux, 'child.pid')
-        fx.install_hook('pre-commit', (
+        hook = fx.install_hook('pre-commit', (
             '#!/bin/sh\n'
+            '[ "$1" = --warm-up ] && exit 0\n'
             'echo $$ > "%s"\n'
             'sleep 30 </dev/null >/dev/null 2>&1 &\n'
             'echo $! > "%s"\n'
             'sleep 6\n') % (hook_pid, child_pid))
         self.addCleanup(self._kill_pids, hook_pid, child_pid)
+        # The first exec of a newly written script can take most of a second on
+        # macOS before its first line runs, which would let the 1 s timeout fire
+        # before the hook starts; git runs pre-commit without arguments.
+        warm = subprocess.run([hook, '--warm-up'], cwd=fx.root, env=fx.env,
+                              stdin=subprocess.DEVNULL, timeout=30)
+        self.assertEqual(warm.returncode, 0, 'hook warm-up failed')
+        self.assertFalse(os.path.exists(hook_pid) or os.path.exists(child_pid),
+                         'hook warm-up must not run the hook body')
         res = fx.checkpoint('--kind', 'record', '--path', 'a.txt',
                             env_extra={'EG_GIT_TIMEOUT_SECONDS': '1'}, timeout=40)
         # EG-S1-AC14-W1: without a timeout the hook finishes after 6 s and the

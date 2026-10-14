@@ -184,14 +184,14 @@ class EgProcess(object):
                         elapsed, timed_out)
 
 
-def start_eg(subcmd, args, cwd, env, eg_py=None):
-    argv = [PYTHON, eg_py or EG_PY, subcmd] + list(args)
+def start_eg(subcmd, args, cwd, env, eg_py=None, python_args=()):
+    argv = [PYTHON] + list(python_args) + [eg_py or EG_PY, subcmd] + list(args)
     started = time.monotonic()
     popen = subprocess.Popen(argv, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                              start_new_session=True)
     _LIVE_PROCS.append(popen)
-    return EgProcess(argv[2:], popen, started)
+    return EgProcess(argv[len(python_args) + 2:], popen, started)
 
 
 class Fixture(object):
@@ -402,14 +402,15 @@ class Fixture(object):
         return env
 
     def start(self, subcmd, args, cwd=None, env_extra=None, env_remove=(),
-              path_prefix=None, eg_py=None):
+              path_prefix=None, eg_py=None, python_args=()):
         env = self.env_for(env_extra, env_remove, path_prefix)
-        return start_eg(subcmd, args, cwd or self.root, env, eg_py=eg_py)
+        return start_eg(subcmd, args, cwd or self.root, env, eg_py=eg_py,
+                        python_args=python_args)
 
     def run(self, subcmd, args, cwd=None, env_extra=None, env_remove=(),
-            path_prefix=None, timeout=DEFAULT_RUN_TIMEOUT, eg_py=None):
+            path_prefix=None, timeout=DEFAULT_RUN_TIMEOUT, eg_py=None, python_args=()):
         return self.start(subcmd, args, cwd, env_extra, env_remove, path_prefix,
-                          eg_py).finish(timeout)
+                          eg_py, python_args).finish(timeout)
 
     def checkpoint(self, *args, **kw):
         return self.run('checkpoint', list(args), **kw)

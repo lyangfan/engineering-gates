@@ -63,3 +63,23 @@
 
 - 本机 `/usr/bin/python3` 的用户 site-packages（`~/Library/Python/3.9/lib/python/site-packages/tests/`，由 `ppdiffusers` 安装）中有一个普通包 `tests`。普通包优先于命名空间包，所以在基准 commit `26f2e0c`（仓库中没有 `tests/__init__.py`）上，按任务给出的命令运行会报 `ModuleNotFoundError: No module named 'tests.acceptance'`；当时只能以 `PYTHONNOUSERSITE=1` 运行。
 - 编写期间分支上新增了提交 `e09f7df`（EG-S2 测试冻结），其中带有 `tests/__init__.py` 与 `tests/acceptance/__init__.py`。此后原命令可以直接运行。若在没有这两个文件的检出上运行，需要设置 `PYTHONNOUSERSITE=1`。AC16 的干净虚拟环境不含用户 site，不受影响。
+
+## 四、测试修正 1：AC01 字节码检查与 AC14 超时测试的稳定性
+
+基准 `997ba8e`。两处修正都只改变测试的运行条件，断言没有变化，也没有放宽。
+
+### AC01：字节码写入位置不受解释器内置前缀影响（`test_ac01_no_pycache_after_running`）
+
+- 原因：macOS 系统 Python 3.9（`/usr/bin/python3`）内置非空的 `sys.pycache_prefix`（`$HOME/Library/Caches/com.apple.python`），环境变量中没有 `PYTHONPYCACHEPREFIX` 时也是如此。夹具把子进程的 `HOME` 设到夹具的 `home/` 下，所以入口不关闭字节码写入时，`.pyc` 写到 `<夹具>/home/Library/Caches/com.apple.python/…`，而测试只检查项目副本与夹具仓库，看不到这些文件。补丁作者实测：把 `scripts/eg.py` 中的 `sys.dont_write_bytecode = True` 换成 `pass`，原测试仍通过。
+- 做法：运行项目副本的 `scripts/eg.py` 时，在解释器参数中加 `-X pycache_prefix=`（值为空）。空值使 `sys.pycache_prefix` 为 `None`，且优先于环境变量与解释器内置默认值，于是项目模块的字节码只能写到源码旁的 `__pycache__`，即测试检查的位置。与 EG-S2 AC20 的做法相同（见 `tests/acceptance/eg_s2/NOTES.md` 第 5 节），没有采用"把 `PYTHONPYCACHEPREFIX` 指向被检查目录"，因为那样解释器在 `eg.py` 第一行之前就会写入标准库的 `.pyc`。`support.start_eg()`、`Fixture.start()`、`Fixture.run()` 为此增加 `python_args` 参数，默认为空，其他测试的命令行不变。
+- 为避免在其他解释器上悄悄退化成空测试，运行前先用同样的参数与夹具环境启动子解释器，确认 `sys.pycache_prefix` 为 `None`、`sys.dont_write_bytecode` 为 `False`；不满足时测试失败并指出是测试环境问题。
+- 实测：修正后，把 `sys.dont_write_bytecode = True` 换成 `pass`，该测试因副本中出现 `scripts/egcheckpoint/__pycache__` 等目录而失败；恢复后通过。
+
+### AC14：钩子在 1 秒超时内来不及启动（`test_ac14_timeout_terminates_hook_process_group`）
+
+- 现象："hook did not start" 偶发失败，此时其余断言（退出码 1、`result: error`、HEAD 不变、无 `index.lock`、暂存区已恢复）都成立，`message` 为 "git 超时：commit"。
+- 原因：在本机上，首次执行一个新写入的可执行脚本，从 exec 到脚本第一行开始执行有约 0.4–0.8 秒、偶尔超过 1 秒的延迟（推测为 macOS 对新文件的执行前安全检查）；同一文件再次执行只需几毫秒。钩子每次都由夹具新写入，所以这段延迟落在 `EG_GIT_TIMEOUT_SECONDS=1` 的 1 秒之内，叠加负载时钩子还没写出 pid 文件，git 就已被超时终止。问题在测试的时序假设，不在实现：git 的 trace2 记录显示 commit 在启动后约 3 毫秒就已启动钩子（`child_start`），之前的各次 git 调用每次只需几毫秒。
+- 证据（本机，git 2.50.1，Python 3.9.6）：
+  - 单独测量新写入的 `#!/bin/sh` 脚本从 exec 到第一行执行：40 次中最短 0.368 秒、中位数 0.517 秒、最长 0.808 秒；另有 4 个 `yes` 负载进程时 60 次中最长 1.080 秒。同一脚本重复执行为 0.003 秒左右。
+  - 以本测试的夹具与钩子重复运行该场景，对比 trace2 中钩子的 `child_start` 时间与钩子 pid 文件的修改时间：不预热时 40 次的启动延迟为 0.415–0.784 秒（中位数 0.597 秒）；另外 45 次不预热的运行中有 5 次钩子没有启动，trace2 中照样有 `child_start`。预热后 40 次为 0.002–0.005 秒，没有失败。
+- 做法：钩子第一行为 `[ "$1" = --warm-up ] && exit 0`；安装后、运行 checkpoint 之前，测试以 `--warm-up` 参数直接执行一次钩子，断言其退出码为 0 且没有写出 pid 文件。git 执行 pre-commit 钩子时不带参数，所以 checkpoint 期间钩子的行为与原来完全相同（睡眠 6 秒、启动一个子进程）。`EG_GIT_TIMEOUT_SECONDS=1`、钩子睡眠 6 秒、40 秒运行上限以及全部断言都没有改动。
