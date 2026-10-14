@@ -198,6 +198,13 @@
       "status": "active",
       "source": "dialogue.md#round-s1-k",
       "date": "2026-10-14"
+    },
+    {
+      "id": "D-027",
+      "statement": "EG-S1 起草中的实质选择 X1—X5：X1 checkpoint 与 identity 的退出码为 0 成功或一致、1 前置条件不满足或被拒绝或身份不一致、2 用法或输入错误；X2 调用 git 不经过 shell，单次超时 300 秒，超时按失败处理并恢复暂存区；X3 部分列出路径无改动时照常提交其余路径，无改动的标为 unchanged 并给出其在 HEAD 中的身份，全部无改动才拒绝；X4 列出的路径若已有与 HEAD 不同的暂存内容则拒绝，失败时把这些路径的暂存区恢复到执行前；X5 路径相对于仓库根目录，只接受普通文件，不接受目录、符号链接与 .git 下的路径。",
+      "status": "active",
+      "source": "dialogue.md#round-s1-x",
+      "date": "2026-10-14"
     }
   ]
 }
